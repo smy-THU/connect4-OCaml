@@ -1,0 +1,28 @@
+opam-version: "2.0"
+name:         "connect4"
+version:      "0.1.0"
+synopsis:     "Web Connect4 Game in OCaml"
+license:      "MIT"
+homepage:     "https://github.com/smy-THU/connect4-OCaml"
+bug-reports:  "https://github.com/smy-THU/connect4-OCaml/issues"
+dev-repo:     "git+https://github.com/smy-THU/connect4-OCaml.git"
+description:  """
+A interactive web Connect4 game implemented in OCaml
+"""
+maintainer: [
+    "Shunchi Zhang <shunchizhang.cs@gmail.com>"
+    "Mingyuan Shen <mshen37@jh.edu>"
+]
+authors: [
+    "Shunchi Zhang <shunchizhang.cs@gmail.com>"
+    "Mingyuan Shen <mshen37@jh.edu>"
+]
+
+depends: [
+  "ocaml" {= "5.1.1"}
+  "dune" {>= "2.0.0"}
+  "core" {>= "v0.17.0"}
+  "dream" {>= "1.0.0~alpha7"}
+]
+
+available: os = "linux" | os = "macos"

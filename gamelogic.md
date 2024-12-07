@@ -8,7 +8,7 @@ In this game, two players compete using pieces of different colors. Assume:
 - **Player B** holds black pieces.
 - **Player A** plays first.
 
-### Gameplay:
+### Gameplay
 
 1. The game is played on a grid of **M rows** and **N columns**.
 2. Players take turns dropping a piece into one of the columns.
@@ -16,7 +16,7 @@ In this game, two players compete using pieces of different colors. Assume:
    - If a column is full, no further pieces can be dropped in that column.
 3. The graphical interface allows players to click any cell in a column, automatically placing the piece at the lowest available position in that column.
 
-### Winning Condition:
+### Winning Condition
 
 A player wins by aligning **four or more of their pieces** in any of the following directions:
 - Horizontally
@@ -62,7 +62,7 @@ In the UCT algorithm, the objective is to explore a decision tree and select the
 
 This balance is managed using **Upper Confidence Bounds (UCB)**, which quantifies the confidence in the estimated values of each action. UCT uses the **UCB1 formula** to select actions, which guides the algorithm toward promising parts of the tree while still exploring unvisited branches. The core components of the UCT algorithm involve the **Tree Policy**, **Default Policy**, and **Backup** functions, which are executed repeatedly during simulations to refine the decision tree.
 
-### a simple abstract of the algorithm 
+## a simple abstract of the algorithm 
 ```text
 function UCTSEARCH(s0)
   Create the root node v0 from the state s0;
@@ -101,6 +101,4 @@ function BACKUP(v, Δ)
     Q(v) ← Q(v) + Δ
     Δ ← −Δ
     v ← parent(v)
-
-
-
+```

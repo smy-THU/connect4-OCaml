@@ -3,7 +3,12 @@
  (modules judge_tests)
  (libraries core ounit2 judge))
 
+(library
+ (name state_tests)
+ (modules state_tests)
+ (libraries core ounit2 state))
+
 (test
  (name tests)
  (modules tests)
- (libraries core ounit2 judge_tests))
+ (libraries core ounit2 judge_tests state_tests))

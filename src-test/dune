@@ -8,7 +8,12 @@
  (modules state_tests)
  (libraries core ounit2 state))
 
+(library
+ (name tree_tests)
+ (modules tree_tests)
+ (libraries core ounit2 tree state))
+
 (test
  (name tests)
  (modules tests)
- (libraries core ounit2 judge_tests state_tests))
+ (libraries core ounit2 judge_tests state_tests tree_tests))

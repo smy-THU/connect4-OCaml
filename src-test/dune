@@ -1,3 +1,9 @@
+(library
+ (name judge_tests)
+ (modules judge_tests)
+ (libraries core ounit2 judge))
+
 (test
  (name tests)
- (libraries core ounit2 judge point state strategy tree uct))
+ (modules tests)
+ (libraries core ounit2 judge_tests))

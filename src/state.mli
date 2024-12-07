@@ -1,15 +1,16 @@
 type point = int * int
 
 type t = {
-  mutable player : bool;         (* true for player, false for machine *)
-  mutable next_choice : int;     (* Column choice for the next move *)
-  board : int array array;       (* 2D board array where 0 = empty, 1 = player, 2 = machine *)
-  top : int array;               (* Tracks the topmost unoccupied row in each column *)
-  h: int;
-  w: int;
-  ban_x: int;
-  ban_y: int;
-  mutable last_put : point;      (* Last (x, y) coordinates where a move was made *)
+  mutable player : bool; (* true for player, false for machine *)
+  mutable next_choice : int; (* Column choice for the next move *)
+  board : int array array;
+      (* 2D board array where 0 = empty, 1 = player, 2 = machine *)
+  top : int array; (* Tracks the topmost unoccupied row in each column *)
+  h : int;
+  w : int;
+  ban_x : int;
+  ban_y : int;
+  mutable last_put : point; (* Last (x, y) coordinates where a move was made *)
 }
 
 val create_state : bool -> int -> int -> int -> int -> t

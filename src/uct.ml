@@ -7,7 +7,8 @@ let create_uct player h w ban_x ban_y =
 let tree_policy uct =
   let rec expand_or_best node =
     if Tree.expand node <> None then node
-    else match Tree.best_child node with
+    else
+      match Tree.best_child node with
       | None -> node
       | Some best -> expand_or_best best
   in

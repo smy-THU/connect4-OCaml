@@ -1,8 +1,7 @@
 (* Helper function for horizontal checking *)
 let horizontal_win x y n board player =
   let rec left i count =
-    if i < 0 || board.(x).(i) <> player then count
-    else left (i - 1) (count + 1)
+    if i < 0 || board.(x).(i) <> player then count else left (i - 1) (count + 1)
   in
   let rec right i count =
     if i >= n || board.(x).(i) <> player then count
@@ -13,8 +12,7 @@ let horizontal_win x y n board player =
 (* Helper function for vertical checking *)
 let vertical_win x y m board player =
   let rec down i count =
-    if i >= m || board.(i).(y) <> player then count
-    else down (i + 1) (count + 1)
+    if i >= m || board.(i).(y) <> player then count else down (i + 1) (count + 1)
   in
   down (x + 1) 1 >= 4
 
@@ -54,5 +52,4 @@ let user_win x y m n board = check_win x y m n board 1
 let machine_win x y m n board = check_win x y m n board 2
 
 (* Function to check for a tie *)
-let is_tie top =
-  Array.for_all (fun t -> t <= 0) top
+let is_tie top = Array.for_all (fun t -> t <= 0) top

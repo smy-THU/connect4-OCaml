@@ -7,7 +7,7 @@
 
 (library
  (name judge)
-(modules judge)
+ (modules judge)
  (libraries core)
  (preprocess
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
@@ -19,21 +19,21 @@
  (preprocess
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 
- (library
+(library
  (name tree)
  (modules tree)
  (libraries core point judge state)
  (preprocess
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 
- (library
+(library
  (name uct)
  (modules uct)
  (libraries core state tree point judge)
  (preprocess
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 
- (library
+(library
  (name strategy)
  (modules strategy)
  (libraries core point state tree uct judge)

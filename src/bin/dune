@@ -1,0 +1,11 @@
+(executable
+ (name connect4)
+ (libraries dream core core_unix core_unix.sys_unix stdio)
+ (preprocess
+  (pps lwt_ppx)))
+
+(rule
+ (targets connect4.ml)
+ (deps connect4.eml.ml)
+ (action
+  (run dream_eml %{deps} --workspace %{workspace_root})))

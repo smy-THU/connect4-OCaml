@@ -16,6 +16,9 @@ val machine_win : int -> int -> int -> int -> int array array -> bool
     @param board The game board represented as a 2D array.
     @return [true] if the machine has won, [false] otherwise. *)
 
+
+val check_win : int -> int -> int -> int -> int array array -> int -> bool
+
 val is_tie : int array -> bool
 (** [is_tie top] checks if the game is a tie.
     @param top An array representing the topmost filled position of each column.

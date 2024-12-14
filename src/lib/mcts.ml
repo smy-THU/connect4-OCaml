@@ -2,14 +2,14 @@ module type Game = sig
   type state
   type action
 
-  val initial_state : state
+  val initial_state : int -> int -> state
   val is_terminal : state -> bool
   val evaluate : state -> float
   val generate_actions : state -> action list
   val apply_action : state -> action -> state
 end
 
-module MCTS (G : Game) = struct
+module Make (G : Game) = struct
   type node = {
     state : G.state;
     action : G.action option;
@@ -74,7 +74,7 @@ module MCTS (G : Game) = struct
     in
     propagate node
 
-  let mcts (root_state : G.state) (iterations : int) (exploration : float) : G.action =
+  let search (root_state : G.state) (iterations : int) (exploration : float) : G.action =
     let root = create_node root_state in
     for _ = 1 to iterations do
       let rec select node =

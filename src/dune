@@ -5,10 +5,17 @@
  (preprocess
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 
-  (library
+(library
  (name connect4_ban)
  (modules connect4_ban)
  (libraries core judge)
+ (preprocess
+  (pps ppx_deriving.show ppx_jane bisect_ppx)))
+
+(library
+ (name play_mcts)
+ (modules play_mcts)
+ (libraries core connect4 mcts)
  (preprocess
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 

@@ -3,7 +3,7 @@ module type Game = sig
   type state
   type action
 
-  val initial_state : state
+  val initial_state : int -> int -> state
   val is_terminal : state -> bool
   val evaluate : state -> float
   val generate_actions : state -> action list
@@ -15,6 +15,8 @@ type player_t = int (* 1 for Player1, 2 for Player2 *)
 type point_t = int * int
 
 type board_t = int array array (* Flexible rows x cols board *)
+
+type action = int
 
 type state = {
   board : board_t;
@@ -66,11 +68,11 @@ let evaluate (state : state) : float =
   else 0.0
 
 (* Generate a list of valid actions (columns that are not full) *)
-let generate_actions (state : state) : int list =
+let generate_actions (state : state) : action list =
   List.filter (fun col -> state.board.(0).(col) = 0) (List.init state.w (fun x -> x))
 
 (* Apply an action to the board *)
-let apply_action (state : state) (action : int) : state =
+let apply_action (state : state) (action : action) : state =
   if action < 0 || action >= state.w then
     failwith "Invalid column index";
   

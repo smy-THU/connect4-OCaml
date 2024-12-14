@@ -6,6 +6,13 @@
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 
 (library
+ (name mcts)
+ (modules mcts)
+ (libraries core)
+ (preprocess
+  (pps ppx_deriving.show ppx_jane bisect_ppx)))
+
+(library
  (name state)
  (modules state)
  (libraries core judge)

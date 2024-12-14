@@ -1,3 +1,6 @@
+type board_t = int array array
+type player_t = int
+
 val user_win : int -> int -> int -> int -> int array array -> bool
 (** [user_win x y m n board] checks if the user has won the game.
     @param x The row index of the last move.
@@ -18,6 +21,8 @@ val machine_win : int -> int -> int -> int -> int array array -> bool
 
 
 val check_win : int -> int -> int -> int -> int array array -> int -> bool
+
+val check_win_full : board_t -> player_t -> bool
 
 val is_tie : int array -> bool
 (** [is_tie top] checks if the game is a tie.

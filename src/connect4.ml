@@ -1,4 +1,15 @@
 [@@@ocaml.warning "-27"]
+module type Game = sig
+  type state
+  type action
+
+  val initial_state : state
+  val is_terminal : state -> bool
+  val evaluate : state -> float
+  val generate_actions : state -> action list
+  val apply_action : state -> action -> state
+end
+
 type player_t = int (* 1 for Player1, 2 for Player2 *)
 
 type point_t = int * int
@@ -34,13 +45,15 @@ let is_full (board : board_t) : bool =
 
 (* Check for a winning line (horizontal, vertical, or diagonal) *)
 let check_winner (board : board_t) (player : player_t) : bool =
-  failwith "unimplemented"
+  Judge.check_win_full board player
 
 let check_winner_with_last (board : board_t) (last_move : point_t) (player : player_t) : bool =
-  let (x, y) = last_move in
-  let h = Array.length board in
-  let w = if h > 0 then Array.length board.(0) else 0 in
-  Judge.check_win x y h w board player
+  if last_move = (-1, -1) then false
+  else 
+    let (x, y) = last_move in
+    let h = Array.length board in
+    let w = if h > 0 then Array.length board.(0) else 0 in
+    Judge.check_win x y h w board player
 
 (* Check if the state is terminal *)
 let is_terminal (state : state) : bool =

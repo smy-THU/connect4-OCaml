@@ -1,3 +1,6 @@
+type board_t = int array array
+type player_t = int
+
 (* Helper function for horizontal checking *)
 let horizontal_win x y n board player =
   let rec left i count =
@@ -53,3 +56,23 @@ let machine_win x y m n board = check_win x y m n board 2
 
 (* Function to check for a tie *)
 let is_tie top = Array.for_all (fun t -> t <= 0) top
+
+
+let check_win_full (board : board_t) (player : player_t) : bool =
+  let h = Array.length board in
+  let w = if h > 0 then Array.length board.(0) else 0 in
+  let check_direction start_row start_col delta_row delta_col =
+    let rec loop count row col =
+      if count = 4 then true
+      else if row < 0 || row >= h || col < 0 || col >= w then false
+      else if board.(row).(col) = player then loop (count + 1) (row + delta_row) (col + delta_col)
+      else false
+    in
+    loop 0 start_row start_col
+  in
+  let directions = [(0, 1); (1, 0); (1, 1); (1, -1)] in
+  Array.mapi (fun row line ->
+    Array.mapi (fun col _ ->
+      List.exists (fun (dr, dc) -> check_direction row col dr dc) directions
+    ) line |> Array.exists (fun x -> x)
+  ) board |> Array.exists (fun x -> x)

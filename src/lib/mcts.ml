@@ -2,7 +2,7 @@ module type Game = sig
   type state
   type action
 
-  val initial_state : int -> int -> state
+  val initial_state : int -> int -> int -> state
   val is_terminal : state -> bool
   val evaluate : state -> float
   val generate_actions : state -> action list
@@ -32,7 +32,7 @@ module Make (G : Game) = struct
     if child.visits = 0 then infinity
     else
       (child.wins /. float_of_int child.visits)
-      +. exploration *. sqrt (log (float_of_int total_visits) /. float_of_int child.visits)
+      +. exploration *. sqrt (2.0 *. log (float_of_int total_visits) /. float_of_int child.visits)
 
   let select_best_node (node : node) (exploration : float) : node =
     List.fold_left

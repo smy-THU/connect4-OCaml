@@ -19,4 +19,11 @@
  (preprocess
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 
+(executable
+ (name play_alpha)
+ (modules play_alpha)
+ (libraries core connect4 alpha_beta)
+ (preprocess
+  (pps ppx_deriving.show ppx_jane bisect_ppx)))
+
 

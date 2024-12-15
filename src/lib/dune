@@ -13,6 +13,13 @@
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 
 (library
+ (name alpha_beta)
+ (modules alpha_beta)
+ (libraries core)
+ (preprocess
+  (pps ppx_deriving.show ppx_jane bisect_ppx)))
+
+(library
  (name state)
  (modules state)
  (libraries core judge)

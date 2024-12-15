@@ -3,7 +3,6 @@ module type Game = sig
   type state
   type action
 
-  val initial_state : int -> int -> state
   val is_terminal : state -> bool
   val evaluate : state -> float
   val generate_actions : state -> action list
@@ -43,11 +42,17 @@ let initial_state (h:int) (w:int) (player:player_t) : state = {
 
 (* Check if the board is full *)
 let is_full (board : board_t) : bool =
-  Array.for_all (fun col -> col.(0) <> 0) board
+  if Array.length board < 1 then 
+    failwith "the board is invalid."
+  else
+    Array.for_all (fun ele -> ele <> 0) board.(0)
 
 let is_empty (board : board_t) : bool =
   let h = Array.length board in
-  Array.for_all (fun col -> (col.(h-1) <> 1 && col.(h-1) <> 2)) board
+  if h < 1 then 
+    failwith "the board is invalid."
+  else
+    Array.for_all (fun col -> col <> 1 && col <> 2) board.(h-1)
 
 let check_winner (board : board_t) (player : player_t) : bool =
   Judge.check_win_full board player

@@ -2,7 +2,6 @@ module type Game = sig
   type state
   type action
 
-  val initial_state : int -> int -> int -> state
   val is_terminal : state -> bool
   val evaluate : state -> float
   val generate_actions : state -> action list

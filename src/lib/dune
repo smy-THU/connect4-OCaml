@@ -13,6 +13,14 @@
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 
 (library
+ (name minimax)
+ (modules minimax)
+ (libraries core)
+ (preprocess
+  (pps ppx_deriving.show ppx_jane bisect_ppx)))
+
+
+(library
  (name alpha_beta)
  (modules alpha_beta)
  (libraries core)

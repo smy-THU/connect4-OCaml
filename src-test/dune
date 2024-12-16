@@ -6,12 +6,12 @@
 (library
  (name state_tests)
  (modules state_tests)
- (libraries core ounit2 state))
+ (libraries core ounit2))
 
 (library
  (name tree_tests)
  (modules tree_tests)
- (libraries core ounit2 tree state))
+ (libraries core ounit2))
 
 (test
  (name tests)

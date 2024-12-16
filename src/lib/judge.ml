@@ -1,5 +1,6 @@
 type board_t = int array array
 type player_t = int
+type point_t = int * int
 
 (* Helper function for horizontal checking *)
 let horizontal_win x y n board player =
@@ -76,3 +77,14 @@ let check_win_full (board : board_t) (player : player_t) : bool =
       List.exists (fun (dr, dc) -> check_direction row col dr dc) directions
     ) line |> Array.exists (fun x -> x)
   ) board |> Array.exists (fun x -> x)
+
+let point_is_in (point:point_t) (board:board_t) : bool =
+  let h = Array.length board in
+  if h < 1 then false
+  else
+    let w = Array.length board.(0) in
+    match point with
+    | (x, y) -> 
+      if x<0 || x>=h then false
+      else if y<0 || y>=w then false
+      else true

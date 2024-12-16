@@ -1,5 +1,6 @@
 type board_t = int array array
 type player_t = int
+type point_t = int * int
 
 val user_win : int -> int -> int -> int -> int array array -> bool
 (** [user_win x y m n board] checks if the user has won the game.
@@ -28,3 +29,5 @@ val is_tie : int array -> bool
 (** [is_tie top] checks if the game is a tie.
     @param top An array representing the topmost filled position of each column.
     @return [true] if the game is a tie, [false] otherwise. *)
+
+val point_is_in : point_t -> board_t -> bool

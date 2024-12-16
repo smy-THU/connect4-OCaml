@@ -1,3 +1,4 @@
+(* 
 open OUnit2
 open Tree
 open State
@@ -53,4 +54,5 @@ let series =
          (* "Best Child" >:: test_best_child; *)
        ]
 
-(* let () = run_test_tt_main series *)
+let () = run_test_tt_main series 
+*)

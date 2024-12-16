@@ -32,13 +32,19 @@ let empty_board rows cols: board_t =
 
 
 (* Create the initial state with specified dimensions *)
-let initial_state (h:int) (w:int) (player:player_t) : state = {
-  board = empty_board h w;
-  current_player = player;
-  h;
-  w;
-  last_move = (-1, -1);
-}
+let initial_state (h:int) (w:int) (player:player_t) : state = 
+  if h < 6 || h > 12 || w < 6 || w > 12 then 
+    failwith "board size invalid"
+  else if player <> 1 || player <> 2 then
+    failwith "player not valid when initial state"
+  else
+  {
+    board = empty_board h w;
+    current_player = player;
+    h;
+    w;
+    last_move = (-1, -1);
+  }
 
 (* Check if the board is full *)
 let is_full (board : board_t) : bool =

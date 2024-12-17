@@ -42,6 +42,9 @@ let initial_state (h:int) (w:int) (player:player_t) (ban_point : point_t): state
   else if Judge.point_is_in ban_point new_board then
     failwith "ban_point is not in board"
   else
+    let (x, y) = ban_point in
+    new_board.(x).(y) <- -1; 
+    (* ban_point is -1 on the board*)
   {
     board = new_board;
     current_player = player;
@@ -69,7 +72,9 @@ let check_winner (board : board_t) (player : player_t) : bool =
   Judge.check_win_full board player
 
 let check_winner_with_last (state:state) : bool =
-  if state.last_move = (-1, -1) then false
+  (* the state is initial state*)
+  if state.last_move = (-1, -1) then
+    false
   else 
     let (x, y) = state.last_move in
     let last_player = 3 - state.current_player in
@@ -93,7 +98,21 @@ let evaluate (state : state) : float =
 
 (* Generate a list of valid actions (columns that are not full) *)
 let generate_actions (state : state) : action list =
-  List.filter (fun col -> state.board.(0).(col) = 0) (List.init state.w (fun x -> x))
+  (* the list consists of the column number of ban_points on the 0th row*)
+  let ban_top_ls = List.filter (fun col -> state.board.(0).(col) = 1) (List.init state.w (fun x -> x)) in
+
+  (* normal situation: no ban point on the 0th row*)
+  if List.length ban_top_ls = 0 then
+    List.filter (fun col -> state.board.(0).(col) = 0) (List.init state.w (fun x -> x))
+  else
+    (* ban point on 0th row columns which has empty space under, which means actions is valid here*)
+    let empty_ban_ls = List.filter (fun col -> state.board.(1).(col) = 0) ban_top_ls in
+    let all_actions = List.init state.w (fun x -> x) in
+    let is_valid (col:int) : bool =
+      state.board.(0).(col) = 0 ||
+      List.mem col ban_top_ls && List.mem col empty_ban_ls
+    in
+    List.filter is_valid all_actions
 
 (* Apply an action to the board *)
 let apply_action (state : state) (action : action) : state =
@@ -106,9 +125,19 @@ let apply_action (state : state) (action : action) : state =
     failwith "Column is full, no space to drop";
 
   let rec drop row : point_t =
-    if row = state.h || new_board.(row).(action) <> 0 then (
+    if row = state.h || new_board.(row).(action) = 1 || new_board.(row).(action) = 2 then (
       new_board.(row - 1).(action) <- state.current_player;
       (row - 1, action)
+    )
+    (* deal with ban point*)
+    else if new_board.(row).(action) = -1 then (
+      (* if no space under ban point*)
+      if row = (state.h-1) || new_board.(row+1).(action) <> 0 then (
+        new_board.(row - 1).(action) <- state.current_player;
+        (row - 1, action)
+      )
+      else
+        drop (row + 1)
     )
     else
       drop (row + 1)

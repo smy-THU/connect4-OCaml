@@ -77,4 +77,3 @@ let check_win_full (board : board_t) (player : player_t) : bool =
       List.exists (fun (dr, dc) -> check_direction row col dr dc) directions
     ) line |> Array.exists (fun x -> x)
   ) board |> Array.exists (fun x -> x)
-

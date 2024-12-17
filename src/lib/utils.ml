@@ -1,13 +1,3 @@
-module type Game = sig
-  type state
-  type action
-
-  val is_terminal : state -> bool
-  val evaluate : state -> float
-  val generate_actions : state -> action list
-  val apply_action : state -> action -> state
-end
-
 type player_t = int (* 1 for Player1, 2 for Player2 *)
 
 type point_t = int * int

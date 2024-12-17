@@ -6,6 +6,13 @@
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 
 (library
+ (name utils)
+ (modules utils)
+ (libraries core)
+ (preprocess
+  (pps ppx_deriving.show ppx_jane bisect_ppx)))
+
+(library
  (name mcts)
  (modules mcts)
  (libraries core)

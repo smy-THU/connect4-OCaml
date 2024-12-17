@@ -1,14 +1,21 @@
 (library
  (name connect4)
  (modules connect4)
- (libraries core judge)
+ (libraries core judge utils)
  (preprocess
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 
 (library
  (name connect4_ban)
  (modules connect4_ban)
- (libraries core judge)
+ (libraries core judge utils)
+ (preprocess
+  (pps ppx_deriving.show ppx_jane bisect_ppx)))
+
+(library
+ (name connect4_bonus)
+ (modules connect4_bonus)
+ (libraries core judge utils)
  (preprocess
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 

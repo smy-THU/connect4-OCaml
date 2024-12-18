@@ -2,11 +2,11 @@
 
 import * as Caml_int32 from "rescript/lib/es6/caml_int32.js";
 import * as Belt_Option from "rescript/lib/es6/belt_Option.js";
+import * as Caml_format from "rescript/lib/es6/caml_format.js";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import * as Webapi__Dom__Element from "rescript-webapi/src/Webapi/Dom/Webapi__Dom__Element.res.mjs";
-
-console.log("Hello, world!");
+import * as Webapi__Dom__HtmlInputElement from "rescript-webapi/src/Webapi/Dom/Webapi__Dom__HtmlInputElement.res.mjs";
 
 var host = window.location.host;
 
@@ -70,7 +70,23 @@ function renderBoard() {
   }
 }
 
-renderBoard();
+function new_game($$event) {
+  $$event.preventDefault();
+  var row_element = Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById("board-rows")));
+  var row_element$1 = Belt_Option.getExn(Webapi__Dom__HtmlInputElement.ofElement(row_element));
+  boardRows.contents = Caml_format.int_of_string(row_element$1.value);
+  var col_element = Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById("board-cols")));
+  var col_element$1 = Belt_Option.getExn(Webapi__Dom__HtmlInputElement.ofElement(col_element));
+  boardCols.contents = Caml_format.int_of_string(col_element$1.value);
+  if (enableNewGame.contents) {
+    renderBoard();
+    enableNewGame.contents = false;
+  } else {
+    window.alert("You can't start a new game now.");
+  }
+}
+
+Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById("board-size-form"))).addEventListener("submit", new_game);
 
 function updateBoard(s_row, s_col, value) {
   var cell_id = "cell-r" + s_row + "-c" + s_col;
@@ -124,6 +140,7 @@ export {
   handleCellClick ,
   createCell ,
   renderBoard ,
+  new_game ,
   updateBoard ,
 }
-/*  Not a pure module */
+/* host Not a pure module */

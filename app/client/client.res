@@ -2,8 +2,6 @@ open Webapi
 open Webapi.Dom
 open Belt.Option
 
-Console.log("Hello, world!")
-
 let host = window->Window.location->Location.host
 let socket = WebSocket.make(`ws://${host}/websocket`)
 
@@ -60,23 +58,30 @@ let renderBoard = () => {
   }
 }
 
-// let new_game = event => {
-//   switch enableNewGame.contents {
-//   | false => window->Window.alert("You can't start a new game now.")
-//   | true => {
-//       Js.log("get_board_size")
-//       renderBoard()
-//       enableNewGame := false
-//     }
-//   }
-// }
+let new_game = event => {
+  Event.preventDefault(event)
 
-// document
-// ->Document.getElementById("board-size-form")
-// ->getExn
-// ->Element.addEventListener("submit", get_board_size)
+  let row_element = document->Document.getElementById("board-rows")->getExn
+  let row_element = HtmlInputElement.ofElement(row_element)->getExn
+  boardRows := row_element->HtmlInputElement.value->int_of_string
 
-renderBoard()
+  let col_element = document->Document.getElementById("board-cols")->getExn
+  let col_element = HtmlInputElement.ofElement(col_element)->getExn
+  boardCols := col_element->HtmlInputElement.value->int_of_string
+
+  switch enableNewGame.contents {
+  | false => window->Window.alert("You can't start a new game now.")
+  | true => {
+      renderBoard()
+      enableNewGame := false
+    }
+  }
+}
+
+document
+->Document.getElementById("board-size-form")
+->getExn
+->Element.addEventListener("submit", new_game)
 
 let updateBoard = (s_row, s_col, value) => {
   let cell_id = `cell-r${s_row}-c${s_col}`

@@ -1,0 +1,86 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background: #f5f5f5;
+  color: #333;
+  text-align: center;
+}
+
+h1 {
+  margin-top: 20px;
+}
+
+#board-size-form {
+  display: inline-block;
+  margin: 20px auto;
+  padding: 10px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#board-size-form div {
+  margin: 5px 0;
+}
+
+#board-size-form input {
+  width: 60px;
+  padding: 4px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+
+#board-size-form button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+#board-size-form button:hover {
+  background: #45a049;
+}
+
+#board {
+  margin: 20px auto;
+  display: grid;
+  gap: 2px; /* space between cells */
+  max-width: fit-content;
+}
+
+#agent-difficulty-container {
+  display: block;
+  margin-top: 10px;
+}
+#board-size-form > div {
+  margin-bottom: 10px;
+}
+
+.cell {
+  width: 50px;
+  height: 50px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.cell:hover {
+  background: #d0d0d0;
+}
+
+.player-cell {
+  background: #ffc107; /* A warm yellow for player cells */
+}
+
+.agent-cell {
+  background: #2196f3; /* A bright blue for agent cells */
+}
+
+.blocker-cell {
+  background: #9e9e9e; /* A neutral gray for blocker cells */
+}

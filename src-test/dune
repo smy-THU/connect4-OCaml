@@ -4,16 +4,32 @@
  (libraries core ounit2 judge))
 
 (library
- (name state_tests)
- (modules state_tests)
- (libraries core ounit2))
+ (name alpha_beta_tests)
+ (modules alpha_beta_tests)
+ (libraries core ounit2 alpha_beta))
+
 
 (library
- (name tree_tests)
- (modules tree_tests)
- (libraries core ounit2))
+ (name mcts_tests)
+ (modules mcts_tests)
+ (libraries core ounit2 mcts))
+
+(library
+ (name minimax_tests)
+ (modules minimax_tests)
+ (libraries core ounit2 minimax))
+
+(library
+ (name connect4_tests)
+ (modules connect4_tests)
+ (libraries core ounit2 connect4))
+
+(library
+ (name connect4_ban_tests)
+ (modules connect4_ban_tests)
+ (libraries core ounit2 connect4_ban))
 
 (test
  (name tests)
  (modules tests)
- (libraries core ounit2 judge_tests state_tests tree_tests))
+ (libraries core ounit2 judge_tests alpha_beta_tests mcts_tests minimax_tests connect4_tests connect4_ban_tests))

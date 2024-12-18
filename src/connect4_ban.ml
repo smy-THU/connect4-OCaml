@@ -39,7 +39,7 @@ let initial_state (h:int) (w:int) (player:player_t) (ban_point : point_t): state
     failwith "board size invalid"
   else if player <> 1 && player <> 2 then
     failwith "player not valid when initial state"
-  else if Utils.point_is_in ban_point new_board then
+  else if not (Utils.point_is_in ban_point new_board) then
     failwith "ban_point is not in board"
   else
     let (x, y) = ban_point in
@@ -103,7 +103,7 @@ let is_terminal (state : state) : bool =
   if is_empty state.board then 
     false
   else
-    is_full state.board || check_winner_with_last state
+    is_full state.board || check_winner state.board state.current_player || check_winner state.board (Utils.switch_player state.current_player)
 
 (* Evaluate the board: return +1 for Player1 win, -1 for Player2 win, 0 otherwise *)
 let evaluate (state : state) : float =

@@ -37,7 +37,7 @@ let initial_state (h:int) (w:int) (player:player_t) (bonus_point : point_t): sta
     failwith "board size invalid"
   else if player <> 1 && player <> 2 then
     failwith "player not valid when initial state"
-  else if Utils.point_is_in bonus_point new_board then
+  else if not (Utils.point_is_in bonus_point new_board) then
     failwith "bonus_point is not in board"
   else
     let (x, y) = bonus_point in

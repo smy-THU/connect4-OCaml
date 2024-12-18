@@ -30,3 +30,9 @@ let point_is_in (point:point_t) (board:board_t) : bool =
 (* Initialize an empty board with specified dimensions *)
 let empty_board rows cols: board_t = 
   Array.make_matrix rows cols 0
+
+let switch_player (player:player_t) : player_t =
+  if player <> 1 && player <> 2 then
+    failwith "player invalid"
+  else
+    3 - player

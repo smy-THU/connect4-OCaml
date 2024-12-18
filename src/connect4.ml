@@ -1,4 +1,4 @@
-[@@@ocaml.warning "-27"]
+[@@@ocaml.warning "-32"]
 module type Game = sig
   type state
   type action
@@ -24,8 +24,6 @@ type state = {
   w : int;
   last_move : point_t;
 }
-
-
 
 
 (* Create the initial state with specified dimensions *)
@@ -74,7 +72,7 @@ let is_terminal (state : state) : bool =
   if is_empty state.board then 
     false
   else
-    is_full state.board || check_winner_with_last state
+    is_full state.board || check_winner state.board state.current_player || check_winner state.board (3-state.current_player)
 
 (* Evaluate the board: return +1 for Player1 win, -1 for Player2 win, 0 otherwise *)
 let evaluate (state : state) : float =

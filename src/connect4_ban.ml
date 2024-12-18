@@ -60,7 +60,8 @@ let is_full (board : board_t) : bool =
     failwith "the board is invalid."
   else
     let w = Utils.get_w board in
-    let ban_top_ls = List.filter (fun col -> board.(0).(col) = -1) (List.init w (fun x -> x)) in
+    let all_cols = (List.init w (fun x -> x)) in
+    let ban_top_ls = List.filter (fun col -> board.(0).(col) = -1) all_cols in
     if List.length ban_top_ls = 0 then
       Array.for_all (fun ele -> ele <> 0) board.(0)
     else
@@ -74,7 +75,7 @@ let is_full (board : board_t) : bool =
         | -1 -> if (List.mem col full_ban_ls) then true else false
         | _ -> failwith "invalid point value on the board."
       in
-      Array.for_all is_full_col board.(0)
+      List.for_all is_full_col all_cols
 
 let is_empty (board : board_t) : bool =
   let h = Utils.get_h board in

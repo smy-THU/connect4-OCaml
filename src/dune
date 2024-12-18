@@ -40,3 +40,9 @@
  (preprocess
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 
+(executable
+ (name play_bonus_mcts)
+ (modules play_bonus_mcts)
+ (libraries core connect4_bonus mcts)
+ (preprocess
+  (pps ppx_deriving.show ppx_jane bisect_ppx)))

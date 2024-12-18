@@ -56,17 +56,19 @@ let initial_state (h:int) (w:int) (player:player_t) (bonus_point : point_t): sta
 
 (* Check if the board is full, using the state *)
 let is_full_state (state : state) : bool =
-  if Array.length state.board < 1 then 
+  let h = Utils.get_h state.board in
+  if h < 6 then 
     failwith "the board is invalid."
   else
     match state.get_bonus with
-    | 0 -> Array.for_all (fun ele -> ele <> 0 || ele <> -2) state.board.(0)
+    | 0 -> Array.for_all (fun ele -> ele <> 0 && ele <> -2) state.board.(0)
     | 1 -> false
     | 2 -> (* this is the situation when the ban point has been put on the board.*)
       let w = Utils.get_w state.board in
-      let ban_top_ls = List.filter (fun col -> state.board.(0).(col) = -1) (List.init w (fun x -> x)) in
+      let all_cols = (List.init w (fun x -> x)) in
+      let ban_top_ls = List.filter (fun col -> state.board.(0).(col) = -1) all_cols in
       if List.length ban_top_ls = 0 then
-        Array.for_all (fun ele -> ele <> 0 || ele <> -2) state.board.(0)
+        Array.for_all (fun ele -> ele <> 0 && ele <> -2) state.board.(0)
       else
         let full_ban_ls = List.filter (fun col -> state.board.(1).(col) = 1 || state.board.(1).(col) = 2) ban_top_ls in
         let is_full_col (col:int) : bool =
@@ -77,7 +79,7 @@ let is_full_state (state : state) : bool =
           | -1 -> if (List.mem col full_ban_ls) then true else false
           | _ -> failwith "invalid point value on the board."
         in
-        Array.for_all is_full_col state.board.(0)
+        List.for_all is_full_col all_cols
       | _ -> failwith "invalid get_bonus status in this state"
 
 let is_empty (board : board_t) : bool =
@@ -106,7 +108,7 @@ let is_terminal (state : state) : bool =
   if is_empty state.board then 
     false
   else
-    is_full_state state || check_winner_with_last state
+    is_full_state state || check_winner state.board state.current_player || check_winner state.board (Utils.switch_player state.current_player)
 
 (* Evaluate the board: return +1 for Player1 win, -1 for Player2 win, 0 otherwise *)
 let evaluate (state : state) : float =
@@ -124,10 +126,10 @@ let generate_actions (state : state) : action list =
     List.filter (fun col -> state.board.(0).(col) = 0) all_actions
   | 1 ->
       (* in this situation, the player can put the ban point to any col that is not full*)
-      let is_full (col:int) : bool =
+      let not_full (col:int) : bool =
         state.board.(0).(col) = 0
       in
-      List.filter is_full ((List.init state.w (fun x -> x)))
+      List.filter not_full all_actions
   | 2 ->
     (* this is the situation when the ban_point has been put onto the board.*)
     let ban_top_ls = List.filter (fun col -> state.board.(0).(col) = 1) all_actions in
@@ -206,7 +208,7 @@ let apply_action (state : state) (action : action) : state =
       new_board.(move_x).(move_y) <- state.current_player;
       {
         board = new_board;
-        current_player = state.current_player; (*do not switch player!*)
+        current_player = Utils.switch_player state.current_player; (*switch player!*)
         h = state.h;
         w = state.w;
         last_move = (move_x, move_y);
@@ -219,7 +221,7 @@ let apply_action (state : state) (action : action) : state =
     new_board.(move_x).(move_y) <- -1; (* ban point be put into this move place*)
     {
       board = new_board;
-      current_player = 3 - state.current_player; (* switch player!*)
+      current_player = Utils.switch_player state.current_player; (* switch player!*)
       h = state.h;
       w = state.w;
       last_move = state.last_move; (* NOTICE: last move do not change*)
@@ -232,7 +234,7 @@ let apply_action (state : state) (action : action) : state =
     new_board.(move_x).(move_y) <- state.current_player;
     {
       board = new_board;
-      current_player = 3 - state.current_player; (*do not switch player!*)
+      current_player = Utils.switch_player state.current_player; 
       h = state.h;
       w = state.w;
       last_move = (move_x, move_y);

@@ -4,6 +4,11 @@
  (libraries core ounit2 judge))
 
 (library
+ (name utils_tests)
+ (modules utils_tests)
+ (libraries core ounit2 utils))
+
+(library
  (name alpha_beta_tests)
  (modules alpha_beta_tests)
  (libraries core ounit2 alpha_beta))
@@ -29,7 +34,13 @@
  (modules connect4_ban_tests)
  (libraries core ounit2 connect4_ban))
 
+(library
+ (name connect4_bonus_tests)
+ (modules connect4_bonus_tests)
+ (libraries core ounit2 connect4_bonus))
+
+
 (test
  (name tests)
  (modules tests)
- (libraries core ounit2 judge_tests alpha_beta_tests mcts_tests minimax_tests connect4_tests connect4_ban_tests))
+ (libraries core ounit2 judge_tests utils_tests alpha_beta_tests mcts_tests minimax_tests connect4_tests connect4_ban_tests connect4_bonus_tests))

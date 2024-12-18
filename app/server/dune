@@ -1,8 +1,11 @@
 (executable
  (name server)
- (libraries common dream))
+ (libraries common dream core core_unix core_unix.sys_unix stdio)
+ (preprocess
+  (pps lwt_ppx)))
 
 (rule
  (targets server.ml)
  (deps server.eml.ml)
- (action (run dream_eml %{deps} --workspace %{workspace_root})))
+ (action
+  (run dream_eml %{deps} --workspace %{workspace_root})))

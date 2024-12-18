@@ -1,6 +1,7 @@
 package-lock.json
 
 # esy.
+esy.json
 .esy/
 esy.lock/
 

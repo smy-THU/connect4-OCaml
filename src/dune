@@ -33,4 +33,10 @@
  (preprocess
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
 
+(executable
+ (name play_minimax)
+ (modules play_minimax)
+ (libraries core connect4 minimax)
+ (preprocess
+  (pps ppx_deriving.show ppx_jane bisect_ppx)))
 

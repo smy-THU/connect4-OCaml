@@ -37,7 +37,7 @@ let initial_state (h:int) (w:int) (player:player_t) (ban_point : point_t): state
   let new_board = empty_board h w in
   if h < 6 || h > 12 || w < 6 || w > 12 then 
     failwith "board size invalid"
-  else if player <> 1 || player <> 2 then
+  else if player <> 1 && player <> 2 then
     failwith "player not valid when initial state"
   else if Utils.point_is_in ban_point new_board then
     failwith "ban_point is not in board"

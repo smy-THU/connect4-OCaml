@@ -32,7 +32,7 @@ type state = {
 let initial_state (h:int) (w:int) (player:player_t) : state = 
   if h < 6 || h > 12 || w < 6 || w > 12 then 
     failwith "board size invalid"
-  else if player <> 1 || player <> 2 then
+  else if player <> 1 && player <> 2 then
     failwith "player not valid when initial state"
   else
   {

@@ -758,9 +758,9 @@
       case "game_end":
         var winner = getExn(data[1]);
         if (winner === "tie") {
-          window.alert("Game over! It's a tie! You can start a new game now!");
+          window.alert("Tie!");
         } else {
-          window.alert("Game over! Winner: " + winner + ". You can start a new game now!");
+          window.alert(winner + " Wins!");
         }
         enableNewGame.contents = true;
         return;

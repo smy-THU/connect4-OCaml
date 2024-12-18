@@ -63,8 +63,8 @@ let () =
   Random.self_init ();
   let rows = 6 in
   let cols = 7 in
-  let initial_player = 2 in (*1 for human first, 2 for agent first*)
+  let initial_player = 1 in (*1 for human first, 2 for agent first*)
   let iterations = 100000 in
   let exploration = 0.7 in
-  let bonus_point = (5,3) in
+  let bonus_point = (4,3) in
   play_game rows cols initial_player bonus_point iterations exploration 

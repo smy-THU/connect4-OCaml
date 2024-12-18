@@ -112,7 +112,7 @@ let is_terminal (state : state) : bool =
 
 (* Evaluate the board: return +1 for Player1 win, -1 for Player2 win, 0 otherwise *)
 let evaluate (state : state) : float =
-  if check_winner_with_last state then
+  if check_winner state.board (Utils.switch_player state.current_player) then
     if state.current_player = 1 then 1.0 (*last_player player2 wins*)
     else -1.0 (*last_player player1 wins*)
   else 0.0
@@ -224,7 +224,7 @@ let apply_action (state : state) (action : action) : state =
       current_player = Utils.switch_player state.current_player; (* switch player!*)
       h = state.h;
       w = state.w;
-      last_move = state.last_move; (* NOTICE: last move do not change*)
+      last_move = (move_x, move_y); (* NOTICE: this last move cannot be used for check_win_with_last*)
       ban_point = (move_x, move_y); (* NOTICE: ban point has been put*)
       bonus_point = (-1, -1); (* NOTICE: bonus has been eaten*)
       get_bonus = 2; (* switch to bonus state 2*)

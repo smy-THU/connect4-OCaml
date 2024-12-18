@@ -1,3 +1,15 @@
+# 项目结构
+
+包管理工具
+- `opam`
+- `npm`
+- `esy`
+
+构建
+- `dune`
+- `rescript`
+- `esbuild`
+
 # `w-fullstack-rescript`
 
 <br>

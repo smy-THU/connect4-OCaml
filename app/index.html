@@ -1,6 +1,20 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4x4 Go Board with Gravity</title>
+    <form id="board-size-form">
+      <div>Enter board size (e.g., 4 for 4x4):</div>
+      <div><input type="number" id="rows" min="3" max="5" required /> Rows</div>
+      <div><input type="number" id="cols" min="3" max="5" required /> Columns</div>
+      <button type="submit">Set Board Size</button>
+    </form>
+    <link rel="stylesheet" href="/static/page.css" />
+    <script src="/static/client.js" defer></script>
+  </head>
   <body>
-    <p>"Hello .."</p>
-    <script src="/static/client.js"></script>
+    <h1>4x4 Go Board with Gravity</h1>
+    <div id="board"></div>
   </body>
 </html>

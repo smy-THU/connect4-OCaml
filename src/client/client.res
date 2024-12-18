@@ -153,6 +153,12 @@ socket->WebSocket.addMessageListener(event => {
       updateBoard(s_row, s_col, "block-cell")
       isPlayerTurn := true
     }
+  | "bonus_action" => {
+      let s_row = data[1]->getExn
+      let s_col = data[2]->getExn
+      updateBoard(s_row, s_col, "bonus-cell")
+      isPlayerTurn := true
+    }
   | "invalid_action" => window->Window.alert("You can't place here")
   | "game_end" => {
       let winner = data[1]->getExn

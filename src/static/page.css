@@ -87,3 +87,8 @@ h1 {
 .block-cell:hover {
   background: #9e9e9e; /* A neutral gray for blocker cells */
 }
+
+.bonus-cell,
+.bonus-cell:hover {
+  background: #ff5722; /* A bright red for bonus cells */
+}

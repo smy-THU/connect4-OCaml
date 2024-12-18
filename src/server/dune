@@ -1,6 +1,22 @@
 (executable
  (name server)
- (libraries dream judge core core_unix core_unix.sys_unix stdio)
+ (libraries
+  alpha_beta
+  judge
+  mcts
+  minimax
+  utils
+  connect4_ban
+  connect4_bonus
+  connect4
+  ; play_alpha
+  ; play_mcts
+  ; play_minimax
+  dream
+  core
+  core_unix
+  core_unix.sys_unix
+  stdio)
  (preprocess
   (pps lwt_ppx)))
 

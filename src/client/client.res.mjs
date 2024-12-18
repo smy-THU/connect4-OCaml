@@ -157,6 +157,12 @@ socket.addEventListener("message", (function ($$event) {
               updateBoard(s_row$1, s_col$1, "block-cell");
               isPlayerTurn.contents = true;
               return ;
+          case "bonus_action" :
+              var s_row$2 = Belt_Option.getExn(data[1]);
+              var s_col$2 = Belt_Option.getExn(data[2]);
+              updateBoard(s_row$2, s_col$2, "bonus-cell");
+              isPlayerTurn.contents = true;
+              return ;
           case "game_end" :
               var winner = Belt_Option.getExn(data[1]);
               if (winner === "tie") {
@@ -170,9 +176,9 @@ socket.addEventListener("message", (function ($$event) {
               window.alert("You can't place here");
               return ;
           case "player_action" :
-              var s_row$2 = Belt_Option.getExn(data[1]);
-              var s_col$2 = Belt_Option.getExn(data[2]);
-              return updateBoard(s_row$2, s_col$2, "player-cell");
+              var s_row$3 = Belt_Option.getExn(data[1]);
+              var s_col$3 = Belt_Option.getExn(data[2]);
+              return updateBoard(s_row$3, s_col$3, "player-cell");
           default:
             console.log("???");
             return ;

@@ -5,16 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Connect-4 Game with Gravity</title>
     <link rel="stylesheet" href="/static/page.css" />
-    <script src="/static/client.js" defer></script>
+    <script src="/static/client.res.js" defer></script>
+    <script src="/static/form.res.js" defer></script>
   </head>
   <body>
     <h1>Connect-4 Game with Gravity</h1>
+
     <form id="board-size-form">
-      <div>Enter board size (e.g., 4 for 4x4):</div>
-      <div><input type="number" id="board-rows" min="3" max="5" required /> Rows</div>
-      <div><input type="number" id="board-cols" min="3" max="5" required /> Cols</div>
-      <button type="submit">Set Board Size</button>
+      <!-- Game Mode -->
+      <div>
+        <strong>Game Mode:</strong><br />
+        <select id="game-mode" name="game-mode">
+          <option value="player-vs-agent">Player vs Agent</option>
+          <option value="player-vs-player">Player vs Player</option>
+        </select>
+      </div>
+
+      <!-- Agent Difficulty (only for player vs agent) -->
+      <div id="agent-difficulty-container">
+        <strong>Agent Difficulty:</strong><br />
+        <select id="agent-difficulty" name="agent-difficulty">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
+
+      <!-- Block Mode -->
+      <div>
+        <strong>Block Mode:</strong><br />
+        <select id="block-mode" name="block-mode">
+          <option value="random">Random Block</option>
+          <option value="reward">Reward Block</option>
+        </select>
+      </div>
+
+      <!-- Board Size -->
+      <div>
+        <strong>Board Size:</strong><br />
+        <label>
+          Rows:
+          <input
+            type="number"
+            id="board-rows"
+            name="board-rows"
+            min="6"
+            max="12"
+            required
+          />
+        </label>
+        <label>
+          Columns:
+          <input
+            type="number"
+            id="board-cols"
+            name="board-cols"
+            min="6"
+            max="12"
+            required
+          />
+        </label>
+      </div>
+
+      <button type="submit">Start Game</button>
     </form>
+
     <div id="board"></div>
   </body>
 </html>

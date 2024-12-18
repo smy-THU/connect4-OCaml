@@ -7,6 +7,7 @@ import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import * as Webapi__Dom__Element from "rescript-webapi/src/Webapi/Dom/Webapi__Dom__Element.res.mjs";
 import * as Webapi__Dom__HtmlInputElement from "rescript-webapi/src/Webapi/Dom/Webapi__Dom__HtmlInputElement.res.mjs";
+import * as Webapi__Dom__HtmlSelectElement from "rescript-webapi/src/Webapi/Dom/Webapi__Dom__HtmlSelectElement.res.mjs";
 
 var host = window.location.host;
 
@@ -24,12 +25,24 @@ var enableNewGame = {
   contents: true
 };
 
+var gameMode = {
+  contents: ""
+};
+
+var agentDifficulty = {
+  contents: ""
+};
+
+var blockMode = {
+  contents: ""
+};
+
 var boardRows = {
-  contents: 6
+  contents: -1
 };
 
 var boardCols = {
-  contents: 3
+  contents: -1
 };
 
 function handleCellClick(row, col) {
@@ -72,6 +85,15 @@ function renderBoard() {
 
 function new_game($$event) {
   $$event.preventDefault();
+  var mode_element = Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById("game-mode")));
+  var mode_element$1 = Belt_Option.getExn(Webapi__Dom__HtmlSelectElement.ofElement(mode_element));
+  gameMode.contents = mode_element$1.value;
+  var difficulty_element = Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById("agent-difficulty")));
+  var difficulty_element$1 = Belt_Option.getExn(Webapi__Dom__HtmlSelectElement.ofElement(difficulty_element));
+  agentDifficulty.contents = difficulty_element$1.value;
+  var block_element = Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById("block-mode")));
+  var block_element$1 = Belt_Option.getExn(Webapi__Dom__HtmlSelectElement.ofElement(block_element));
+  blockMode.contents = block_element$1.value;
   var row_element = Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById("board-rows")));
   var row_element$1 = Belt_Option.getExn(Webapi__Dom__HtmlInputElement.ofElement(row_element));
   boardRows.contents = Caml_format.int_of_string(row_element$1.value);
@@ -81,6 +103,14 @@ function new_game($$event) {
   if (enableNewGame.contents) {
     renderBoard();
     enableNewGame.contents = false;
+    console.log("gameMode        : ", gameMode.contents);
+    console.log("agentDifficulty : ", agentDifficulty.contents);
+    console.log("blockMode       : ", blockMode.contents);
+    console.log("boardRows       : ", boardRows.contents);
+    console.log("boardCols       : ", boardCols.contents);
+    console.log("-----------------------------");
+    console.log("isPlayerTurn    : ", isPlayerTurn.contents);
+    console.log("enableNewGame   : ", enableNewGame.contents);
   } else {
     window.alert("You can't start a new game now.");
   }
@@ -90,7 +120,7 @@ Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById("board-si
 
 function updateBoard(s_row, s_col, value) {
   var cell_id = "cell-r" + s_row + "-c" + s_col;
-  Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById(cell_id))).textContent = value;
+  Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById(cell_id))).className = value + " cell";
 }
 
 socket.addEventListener("open", (function (param) {
@@ -104,7 +134,7 @@ socket.addEventListener("message", (function ($$event) {
           case "agent_action" :
               var s_row = Belt_Option.getExn(data[1]);
               var s_col = Belt_Option.getExn(data[2]);
-              updateBoard(s_row, s_col, "O");
+              updateBoard(s_row, s_col, "agent-cell");
               isPlayerTurn.contents = true;
               return ;
           case "game_end" :
@@ -118,7 +148,7 @@ socket.addEventListener("message", (function ($$event) {
           case "player_action" :
               var s_row$1 = Belt_Option.getExn(data[1]);
               var s_col$1 = Belt_Option.getExn(data[2]);
-              return updateBoard(s_row$1, s_col$1, "X");
+              return updateBoard(s_row$1, s_col$1, "player-cell");
           default:
             console.log("???");
             return ;
@@ -135,6 +165,9 @@ export {
   initializeGameState ,
   isPlayerTurn ,
   enableNewGame ,
+  gameMode ,
+  agentDifficulty ,
+  blockMode ,
   boardRows ,
   boardCols ,
   handleCellClick ,

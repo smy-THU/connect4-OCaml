@@ -10,7 +10,7 @@
   "scripts": {
     "clean": "dune clean && rm -rf node_modules package-lock.json",
     "build": "dune build && rescript",
-    "pack": "esbuild client/client.res.mjs --bundle --outfile=static/client.js",
+    "pack": "esbuild client/*.res.mjs --bundle --outdir=static",
     "start": "npm run build && npm run pack && dune exec --root . server/server.exe"
   }
 }

@@ -11,8 +11,12 @@ let initializeGameState = (rows, cols) => {
 
 let isPlayerTurn = ref(true)
 let enableNewGame = ref(true)
-let boardRows = ref(6)
-let boardCols = ref(3)
+
+let gameMode = ref("")
+let agentDifficulty = ref("")
+let blockMode = ref("")
+let boardRows = ref(-1)
+let boardCols = ref(-1)
 
 let handleCellClick = (row, col) => {
   switch isPlayerTurn.contents {
@@ -42,12 +46,12 @@ let renderBoard = () => {
   let s_cols = string_of_int(cols)
   let board = document->Document.getElementById("board")->getExn
   let board_style = board->Element.asHtmlElement->getExn->HtmlElement.style
-  board_style->Dom.CssStyleDeclaration.setProperty(
+  board_style->CssStyleDeclaration.setProperty(
     "grid-template-columns",
     `repeat(${s_cols}, 50px)`,
     "",
   )
-  board_style->Dom.CssStyleDeclaration.setProperty(
+  board_style->CssStyleDeclaration.setProperty(
     "grid-template-rows",
     `repeat(${s_rows}, 50px)`,
     "",
@@ -60,6 +64,18 @@ let renderBoard = () => {
 
 let new_game = event => {
   Event.preventDefault(event)
+
+  let mode_element = document->Document.getElementById("game-mode")->getExn
+  let mode_element = HtmlSelectElement.ofElement(mode_element)->getExn
+  gameMode := mode_element->HtmlSelectElement.value
+
+  let difficulty_element = document->Document.getElementById("agent-difficulty")->getExn
+  let difficulty_element = HtmlSelectElement.ofElement(difficulty_element)->getExn
+  agentDifficulty := difficulty_element->HtmlSelectElement.value
+
+  let block_element = document->Document.getElementById("block-mode")->getExn
+  let block_element = HtmlSelectElement.ofElement(block_element)->getExn
+  blockMode := block_element->HtmlSelectElement.value
 
   let row_element = document->Document.getElementById("board-rows")->getExn
   let row_element = HtmlInputElement.ofElement(row_element)->getExn
@@ -74,6 +90,15 @@ let new_game = event => {
   | true => {
       renderBoard()
       enableNewGame := false
+
+      Js.log2("gameMode        : ", gameMode.contents)
+      Js.log2("agentDifficulty : ", agentDifficulty.contents)
+      Js.log2("blockMode       : ", blockMode.contents)
+      Js.log2("boardRows       : ", boardRows.contents)
+      Js.log2("boardCols       : ", boardCols.contents)
+      Js.log("-----------------------------")
+      Js.log2("isPlayerTurn    : ", isPlayerTurn.contents)
+      Js.log2("enableNewGame   : ", enableNewGame.contents)
     }
   }
 }
@@ -88,7 +113,7 @@ let updateBoard = (s_row, s_col, value) => {
   document
   ->Document.getElementById(cell_id)
   ->getExn
-  ->Element.setTextContent(value)
+  ->Element.setClassName(`${value} cell`)
 }
 
 socket->WebSocket.addOpenListener(_ => {
@@ -105,12 +130,12 @@ socket->WebSocket.addMessageListener(event => {
   | "player_action" => {
       let s_row = data[1]->getExn
       let s_col = data[2]->getExn
-      updateBoard(s_row, s_col, "X")
+      updateBoard(s_row, s_col, "player-cell")
     }
   | "agent_action" => {
       let s_row = data[1]->getExn
       let s_col = data[2]->getExn
-      updateBoard(s_row, s_col, "O")
+      updateBoard(s_row, s_col, "agent-cell")
       isPlayerTurn := true
     }
   | "invalid_action" => window->Window.alert("You can't place here")

@@ -6,6 +6,7 @@ import * as Belt_Option from "rescript/lib/es6/belt_Option.js";
 import * as Caml_format from "rescript/lib/es6/caml_format.js";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
+import * as PervasivesU from "rescript/lib/es6/pervasivesU.js";
 import * as Webapi__Dom__Element from "rescript-webapi/src/Webapi/Dom/Webapi__Dom__Element.res.mjs";
 import * as Webapi__Dom__HtmlInputElement from "rescript-webapi/src/Webapi/Dom/Webapi__Dom__HtmlInputElement.res.mjs";
 import * as Webapi__Dom__HtmlSelectElement from "rescript-webapi/src/Webapi/Dom/Webapi__Dom__HtmlSelectElement.res.mjs";
@@ -24,6 +25,10 @@ var isPlayerTurn = {
 
 var enableNewGame = {
   contents: true
+};
+
+var toBlock = {
+  contents: false
 };
 
 var gameMode = {
@@ -53,7 +58,7 @@ function isColFull(s_col) {
     var s_row = String(i);
     var cell_id = "cell-r" + s_row + "-c" + s_col;
     var cell_class = Belt_Option.getExn(Caml_option.nullable_to_opt(Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById(cell_id))).getAttribute("class")));
-    if (cell_class === "cell") {
+    if (cell_class === "cell" || cell_class === "cell bonus-cell") {
       flag = false;
     }
     
@@ -153,8 +158,49 @@ function new_game($$event) {
 Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById("board-size-form"))).addEventListener("submit", new_game);
 
 function updateBoard(s_row, s_col, value) {
+  console.log("===== updateBoard =====");
+  console.log("updateBoard: " + s_row + ", " + s_col + ", " + value);
   var cell_id = "cell-r" + s_row + "-c" + s_col;
-  Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById(cell_id))).className = "cell " + value;
+  var cell_element = Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById(cell_id)));
+  var is_bonus = Belt_Option.getExn(Caml_option.nullable_to_opt(cell_element.getAttribute("class"))) === "cell bonus-cell";
+  if (blockMode.contents === "reward" && toBlock.contents === true) {
+    cell_element.className = "cell block-cell";
+    console.log("toBlock: " + PervasivesU.string_of_bool(toBlock.contents) + "->false");
+    toBlock.contents = false;
+    if (value === "player-cell") {
+      console.log("isPlayerTurn: " + PervasivesU.string_of_bool(isPlayerTurn.contents) + "->false");
+      isPlayerTurn.contents = false;
+    } else if (value === "agent-cell") {
+      console.log("isPlayerTurn: " + PervasivesU.string_of_bool(isPlayerTurn.contents) + "->true");
+      isPlayerTurn.contents = true;
+    }
+    
+  } else {
+    cell_element.className = "cell " + value;
+    if (is_bonus && blockMode.contents === "reward") {
+      if (value === "player-cell") {
+        console.log("isPlayerTurn: " + PervasivesU.string_of_bool(isPlayerTurn.contents) + "->true");
+        isPlayerTurn.contents = true;
+      } else if (value === "agent-cell") {
+        console.log("isPlayerTurn: " + PervasivesU.string_of_bool(isPlayerTurn.contents) + "->false");
+        isPlayerTurn.contents = false;
+      }
+      
+    } else if (value === "player-cell") {
+      console.log("isPlayerTurn: " + PervasivesU.string_of_bool(isPlayerTurn.contents) + "->false");
+      isPlayerTurn.contents = false;
+    } else if (value === "agent-cell") {
+      console.log("isPlayerTurn: " + PervasivesU.string_of_bool(isPlayerTurn.contents) + "->true");
+      isPlayerTurn.contents = true;
+    }
+    
+  }
+  if (is_bonus && blockMode.contents === "reward" && toBlock.contents === false) {
+    console.log("toBlock: " + PervasivesU.string_of_bool(toBlock.contents) + "->true");
+    toBlock.contents = true;
+    return ;
+  }
+  
 }
 
 socket.addEventListener("open", (function (param) {
@@ -168,9 +214,7 @@ socket.addEventListener("message", (function ($$event) {
           case "agent_action" :
               var s_row = Belt_Option.getExn(data[1]);
               var s_col = Belt_Option.getExn(data[2]);
-              updateBoard(s_row, s_col, "agent-cell");
-              isPlayerTurn.contents = true;
-              return ;
+              return updateBoard(s_row, s_col, "agent-cell");
           case "block_action" :
               var s_row$1 = Belt_Option.getExn(data[1]);
               var s_col$1 = Belt_Option.getExn(data[2]);
@@ -191,6 +235,7 @@ socket.addEventListener("message", (function ($$event) {
                 window.alert(winner + " Wins!");
               }
               enableNewGame.contents = true;
+              isPlayerTurn.contents = false;
               return ;
           case "player_action" :
               var s_row$3 = Belt_Option.getExn(data[1]);
@@ -212,6 +257,7 @@ export {
   initializeGameState ,
   isPlayerTurn ,
   enableNewGame ,
+  toBlock ,
   gameMode ,
   agentDifficulty ,
   blockMode ,

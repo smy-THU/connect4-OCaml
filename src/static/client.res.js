@@ -355,6 +355,15 @@
     return arr;
   }
 
+  // node_modules/rescript/lib/es6/pervasivesU.js
+  function string_of_bool(b) {
+    if (b) {
+      return "true";
+    } else {
+      return "false";
+    }
+  }
+
   // node_modules/rescript-webapi/src/Webapi/Dom/Webapi__Dom__Types.res.mjs
   function encodeContentEditable(x) {
     switch (x) {
@@ -612,6 +621,9 @@
   var enableNewGame = {
     contents: true
   };
+  var toBlock = {
+    contents: false
+  };
   var gameMode = {
     contents: ""
   };
@@ -634,7 +646,7 @@
       var s_row = String(i);
       var cell_id = "cell-r" + s_row + "-c" + s_col;
       var cell_class = getExn(nullable_to_opt(getExn(nullable_to_opt(document.getElementById(cell_id))).getAttribute("class")));
-      if (cell_class === "cell") {
+      if (cell_class === "cell" || cell_class === "cell bonus-cell") {
         flag = false;
       }
     }
@@ -727,8 +739,45 @@
   }
   getExn(nullable_to_opt(document.getElementById("board-size-form"))).addEventListener("submit", new_game);
   function updateBoard(s_row, s_col, value) {
+    console.log("===== updateBoard =====");
+    console.log("updateBoard: " + s_row + ", " + s_col + ", " + value);
     var cell_id = "cell-r" + s_row + "-c" + s_col;
-    getExn(nullable_to_opt(document.getElementById(cell_id))).className = "cell " + value;
+    var cell_element = getExn(nullable_to_opt(document.getElementById(cell_id)));
+    var is_bonus = getExn(nullable_to_opt(cell_element.getAttribute("class"))) === "cell bonus-cell";
+    if (blockMode.contents === "reward" && toBlock.contents === true) {
+      cell_element.className = "cell block-cell";
+      console.log("toBlock: " + string_of_bool(toBlock.contents) + "->false");
+      toBlock.contents = false;
+      if (value === "player-cell") {
+        console.log("isPlayerTurn: " + string_of_bool(isPlayerTurn.contents) + "->false");
+        isPlayerTurn.contents = false;
+      } else if (value === "agent-cell") {
+        console.log("isPlayerTurn: " + string_of_bool(isPlayerTurn.contents) + "->true");
+        isPlayerTurn.contents = true;
+      }
+    } else {
+      cell_element.className = "cell " + value;
+      if (is_bonus && blockMode.contents === "reward") {
+        if (value === "player-cell") {
+          console.log("isPlayerTurn: " + string_of_bool(isPlayerTurn.contents) + "->true");
+          isPlayerTurn.contents = true;
+        } else if (value === "agent-cell") {
+          console.log("isPlayerTurn: " + string_of_bool(isPlayerTurn.contents) + "->false");
+          isPlayerTurn.contents = false;
+        }
+      } else if (value === "player-cell") {
+        console.log("isPlayerTurn: " + string_of_bool(isPlayerTurn.contents) + "->false");
+        isPlayerTurn.contents = false;
+      } else if (value === "agent-cell") {
+        console.log("isPlayerTurn: " + string_of_bool(isPlayerTurn.contents) + "->true");
+        isPlayerTurn.contents = true;
+      }
+    }
+    if (is_bonus && blockMode.contents === "reward" && toBlock.contents === false) {
+      console.log("toBlock: " + string_of_bool(toBlock.contents) + "->true");
+      toBlock.contents = true;
+      return;
+    }
   }
   socket.addEventListener("open", function(param) {
     console.log("Connected.");
@@ -740,9 +789,7 @@
       case "agent_action":
         var s_row = getExn(data[1]);
         var s_col = getExn(data[2]);
-        updateBoard(s_row, s_col, "agent-cell");
-        isPlayerTurn.contents = true;
-        return;
+        return updateBoard(s_row, s_col, "agent-cell");
       case "block_action":
         var s_row$1 = getExn(data[1]);
         var s_col$1 = getExn(data[2]);
@@ -763,6 +810,7 @@
           window.alert(winner + " Wins!");
         }
         enableNewGame.contents = true;
+        isPlayerTurn.contents = false;
         return;
       case "player_action":
         var s_row$3 = getExn(data[1]);

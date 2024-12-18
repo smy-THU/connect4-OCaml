@@ -56,7 +56,54 @@ let apply_action state action =
   | C_ban_st state -> C_ban_st (Connect4_ban.apply_action state action)
   | C_bonus_st state -> C_bonus_st (Connect4_bonus.apply_action state action)
 
-let rec process_player_action ws msg state diff =
+let get_current_player state =
+  match state with
+  | C_st state -> state.current_player
+  | C_ban_st state -> state.current_player
+  | C_bonus_st state -> state.current_player
+
+let rec after_place ws msg state diff =
+  match state_to_winner state with
+  | "continue" -> (
+      match get_current_player state with
+      | 1 -> (
+          (* receive new `player_action` *)
+          match%lwt Dream.receive ws with
+          | None -> Dream.close_websocket ws
+          | Some msg -> process_player_action ws msg state diff)
+      | _ -> process_agent_action ws msg state diff)
+  | winner ->
+      Core_unix.sleep 1;
+      let%lwt () = encode_csv [ "game_end"; winner ] |> Dream.send ws in
+      process ws
+
+and process_agent_action ws msg state diff =
+  (* agent move *)
+  print_endline "Agent is thinking...";
+  let agent_action =
+    (* different agent *)
+    match (state, diff) with
+    | C_st state, "easy" -> C4Minimax.best_action state 5
+    | C_st state, "medium" -> C4Alpha.search state 8
+    | C_st state, "hard" -> C4Mcts.search state 10000 0.7
+    | C_ban_st state, "easy" -> C4BanMinimax.best_action state 5
+    | C_ban_st state, "medium" -> C4BanAlpha.search state 8
+    | C_ban_st state, "hard" -> C4BanMcts.search state 10000 0.7
+    | C_bonus_st state, "easy" -> C4BonusMinimax.best_action state 5
+    | C_bonus_st state, "medium" -> C4BonusAlpha.search state 8
+    | C_bonus_st state, "hard" -> C4BonusMcts.search state 10000 0.7
+    | _ -> failwith "invalid difficulty"
+  in
+  print_endline @@ "Agent chooses column: " ^ string_of_int agent_action;
+  let state = apply_action state agent_action in
+  let res_row, res_col = get_last_move state in
+  let%lwt () =
+    encode_csv [ "agent_action"; string_of_int res_row; string_of_int res_col ]
+    |> Dream.send ws
+  in
+  after_place ws msg state diff
+
+and process_player_action ws msg state diff =
   (* player move *)
   let [ msg_type; player_row; player_col ] = msg |> decode_csv in
   let i_player_col = int_of_string player_col in
@@ -67,46 +114,7 @@ let rec process_player_action ws msg state diff =
     encode_csv [ "player_action"; string_of_int res_row; string_of_int res_col ]
     |> Dream.send ws
   in
-  match state_to_winner state with
-  | "continue" -> (
-      (* agent move *)
-      print_endline "Agent is thinking...";
-      let agent_action =
-        (* different agent *)
-        match (state, diff) with
-        | C_st state, "easy" -> C4Minimax.best_action state 6
-        | C_st state, "medium" -> C4Alpha.search state 8
-        | C_st state, "hard" -> C4Mcts.search state 10000 0.7
-        | C_ban_st state, "easy" -> C4BanMinimax.best_action state 5
-        | C_ban_st state, "medium" -> C4BanAlpha.search state 6
-        | C_ban_st state, "hard" -> C4BanMcts.search state 1000 0.5
-        | C_bonus_st state, "easy" -> C4BonusMinimax.best_action state 4
-        | C_bonus_st state, "medium" -> C4BonusAlpha.search state 4
-        | C_bonus_st state, "hard" -> C4BonusMcts.search state 1000 0.4
-        | _ -> failwith "invalid difficulty"
-      in
-      print_endline @@ "Agent chooses column: " ^ string_of_int agent_action;
-      let state = apply_action state agent_action in
-      let res_row, res_col = get_last_move state in
-      let%lwt () =
-        encode_csv
-          [ "agent_action"; string_of_int res_row; string_of_int res_col ]
-        |> Dream.send ws
-      in
-      match state_to_winner state with
-      | "continue" -> (
-          (* receive new `player_action` *)
-          match%lwt Dream.receive ws with
-          | None -> Dream.close_websocket ws
-          | Some msg -> process_player_action ws msg state diff)
-      | winner ->
-          Core_unix.sleep 1;
-          let%lwt () = encode_csv [ "game_end"; winner ] |> Dream.send ws in
-          process ws)
-  | winner ->
-      Core_unix.sleep 1;
-      let%lwt () = encode_csv [ "game_end"; winner ] |> Dream.send ws in
-      process ws
+  after_place ws msg state diff
 
 and process_new_game ws msg =
   (* game initialization *)
@@ -130,7 +138,8 @@ and process_new_game ws msg =
       shared_commands (C_st state)
   | _ -> (
       let rand_col = Random.int i_cols in
-      let rand_row = Random.int i_rows in
+      (* let rand_row = Random.int i_rows in *)
+      let rand_row = i_rows - 1 in
       let s_rand_col = string_of_int rand_col in
       let s_rand_row = string_of_int rand_row in
       print_endline s_rand_col;

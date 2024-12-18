@@ -11,6 +11,7 @@ let initializeGameState = (rows, cols) => {
 
 let isPlayerTurn = ref(true)
 let enableNewGame = ref(true)
+let toBlock = ref(false)
 
 let gameMode = ref("")
 let agentDifficulty = ref("")
@@ -31,7 +32,7 @@ let isColFull = s_col => {
       ->Element.getAttribute("class")
       ->getExn
 
-    if cell_class == "cell" {
+    if cell_class == "cell" || cell_class == "cell bonus-cell" {
       flag := false
     }
   }
@@ -143,11 +144,47 @@ document
 ->Element.addEventListener("submit", new_game)
 
 let updateBoard = (s_row, s_col, value) => {
+  Js.log("===== updateBoard =====")
+  Js.log(`updateBoard: ${s_row}, ${s_col}, ${value}`)
+
   let cell_id = `cell-r${s_row}-c${s_col}`
-  document
-  ->Document.getElementById(cell_id)
-  ->getExn
-  ->Element.setClassName(`cell ${value}`)
+  let cell_element = document->Document.getElementById(cell_id)->getExn
+  let is_bonus = cell_element->Element.getAttribute("class")->getExn == "cell bonus-cell"
+
+  if blockMode.contents == "reward" && toBlock.contents == true {
+    cell_element->Element.setClassName(`cell block-cell`)
+    Js.log(`toBlock: ${string_of_bool(toBlock.contents)}->false`)
+    toBlock := false
+    if value == "player-cell" {
+      Js.log(`isPlayerTurn: ${string_of_bool(isPlayerTurn.contents)}->false`)
+      isPlayerTurn := false
+    } else if value == "agent-cell" {
+      Js.log(`isPlayerTurn: ${string_of_bool(isPlayerTurn.contents)}->true`)
+      isPlayerTurn := true
+    }
+  } else {
+    cell_element->Element.setClassName(`cell ${value}`)
+    if is_bonus && blockMode.contents == "reward" {
+      if value == "player-cell" {
+        Js.log(`isPlayerTurn: ${string_of_bool(isPlayerTurn.contents)}->true`)
+        isPlayerTurn := true
+      } else if value == "agent-cell" {
+        Js.log(`isPlayerTurn: ${string_of_bool(isPlayerTurn.contents)}->false`)
+        isPlayerTurn := false
+      }
+    } else if value == "player-cell" {
+      Js.log(`isPlayerTurn: ${string_of_bool(isPlayerTurn.contents)}->false`)
+      isPlayerTurn := false
+    } else if value == "agent-cell" {
+      Js.log(`isPlayerTurn: ${string_of_bool(isPlayerTurn.contents)}->true`)
+      isPlayerTurn := true
+    }
+  }
+
+  if is_bonus && blockMode.contents == "reward" && toBlock.contents == false {
+    Js.log(`toBlock: ${string_of_bool(toBlock.contents)}->true`)
+    toBlock := true
+  }
 }
 
 socket->WebSocket.addOpenListener(_ => {
@@ -170,7 +207,6 @@ socket->WebSocket.addMessageListener(event => {
       let s_row = data[1]->getExn
       let s_col = data[2]->getExn
       updateBoard(s_row, s_col, "agent-cell")
-      isPlayerTurn := true
     }
   | "block_action" => {
       let s_row = data[1]->getExn
@@ -191,6 +227,7 @@ socket->WebSocket.addMessageListener(event => {
       | _ => window->Window.alert(`${winner} Wins!`)
       }
       enableNewGame := true
+      isPlayerTurn := false
     }
   | _ => Js.log("???")
   }

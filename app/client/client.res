@@ -6,7 +6,8 @@ let () = {
   switch body {
   | None => ()
   | Some(body) =>
-    let text = Common.greet(#Client)
+    // let text = Common.greet(#Client)
+    let text = "...world!"
 
     let p = document->Document.createElement("p")
     p->Element.setInnerText(text)

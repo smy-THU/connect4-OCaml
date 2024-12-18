@@ -1,10 +1,14 @@
 {
   "name": "fullstack-rescript",
-  "bs-dependencies": [
-    "rescript-webapi"
-  ],
-  "sources": [
-    "common",
-    "client"
-  ]
+  "bs-dependencies": ["@rescript/core", "rescript-webapi"],
+  "package-specs": {
+    "module": "esmodule",
+    "in-source": true
+  },
+  "suffix": ".res.mjs",
+  "bsc-flags": ["-open RescriptCore"],
+  "sources": {
+    "dir": "client",
+    "subdirs": true
+  }
 }

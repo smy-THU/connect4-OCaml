@@ -1,15 +1,16 @@
 {
   "name": "fullstack-rescript",
   "dependencies": {
-    "esbuild": "*",
-    "esy": "*",
-    "rescript": "*",
-    "rescript-webapi": "^0.5.0"
+    "esbuild": "^0.24.0",
+    "esy": "^0.8.0",
+    "@rescript/core": "^1.6.1",
+    "rescript": "^11.1.4",
+    "rescript-webapi": "^0.10.0"
   },
   "scripts": {
-    "postinstall": "npx esy install",
-    "build": "rescript",
-    "pack": "esbuild lib/js/client/client.js --bundle --outfile=static/client.js",
-    "start": "npm run build && npm run pack && npx esy start"
+    "clean": "dune clean && rm -rf node_modules package-lock.json",
+    "build": "dune build && rescript",
+    "pack": "esbuild client/client.res.mjs --bundle --outfile=static/client.js",
+    "start": "npm run build && npm run pack && dune exec --root . server/server.exe"
   }
 }

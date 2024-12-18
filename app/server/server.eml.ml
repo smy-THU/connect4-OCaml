@@ -1,7 +1,7 @@
 let home =
   <html>
     <body>
-      <p><%s Common.greet `Server %></p>
+      <p>"Hello .."</p>
       <script src="/static/client.js"></script>
     </body>
   </html>

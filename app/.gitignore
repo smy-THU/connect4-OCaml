@@ -1,3 +1,9 @@
+package-lock.json
+
+# esy.
+.esy/
+esy.lock/
+
 # BuckleScript.
 node_modules/
 lib/

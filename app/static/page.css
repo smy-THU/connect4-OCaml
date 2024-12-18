@@ -73,14 +73,17 @@ h1 {
   background: #d0d0d0;
 }
 
-.player-cell {
+.player-cell,
+.player-cell:hover {
   background: #ffc107; /* A warm yellow for player cells */
 }
 
-.agent-cell {
+.agent-cell,
+.agent-cell:hover {
   background: #2196f3; /* A bright blue for agent cells */
 }
 
-.blocker-cell {
+.block-cell,
+.block-cell:hover {
   background: #9e9e9e; /* A neutral gray for blocker cells */
 }

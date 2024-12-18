@@ -105,6 +105,7 @@ function new_game($$event) {
   if (enableNewGame.contents) {
     renderBoard();
     enableNewGame.contents = false;
+    isPlayerTurn.contents = true;
     console.log("=============================");
     console.log("gameMode        : ", gameMode.contents);
     console.log("agentDifficulty : ", agentDifficulty.contents);

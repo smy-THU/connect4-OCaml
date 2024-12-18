@@ -1,6 +1,6 @@
-open Core
-
 [@@@ocaml.warning "-8-27"]
+
+open Core
 
 let html_path = "./index.html"
 let static_dir = "./static"
@@ -88,9 +88,9 @@ let encode_csv (line : string list) : string = line |> String.concat ~sep:","
            process ws
        | Some _ | None -> Dream.close_websocket ws)
    | None -> Dream.close_websocket ws *)
-module ConnectFourEasy = Minimax.Make (Connect4)
-module ConnectFourMedium = Alpha_beta.Make (Connect4)
-module ConnectFourHard = Mcts.Make (Connect4)
+module C4Minimax = Minimax.Make (Connect4)
+module C4Alpha = Alpha_beta.Make (Connect4)
+module C4Mcts = Mcts.Make (Connect4)
 
 let state_to_winner state =
   let is_end = Connect4.is_terminal state in
@@ -103,7 +103,7 @@ let state_to_winner state =
       | _ -> "continue")
   | false -> "continue"
 
-let rec process_player_action ws msg state agent =
+let rec process_player_action ws msg state diff =
   (* player move *)
   let [ msg_type; player_row; player_col ] = msg |> decode_csv in
   assert (String.equal msg_type "player_action");
@@ -117,7 +117,14 @@ let rec process_player_action ws msg state agent =
   | "continue" -> (
       (* agent move *)
       print_endline "Agent is thinking...";
-      let agent_action = agent state 6 in
+      let agent_action =
+        (* different agent *)
+        match diff with
+        | "easy" -> C4Minimax.best_action state 6
+        | "medium" -> C4Alpha.search state 8
+        | "hard" -> C4Mcts.search state 100000 0.7
+        | _ -> failwith "invalid difficulty"
+      in
       print_endline @@ "Agent chooses column: " ^ string_of_int agent_action;
       let state = Connect4.apply_action state agent_action in
       let res_row, res_col = state.last_move in
@@ -131,15 +138,17 @@ let rec process_player_action ws msg state agent =
           (* receive new `player_action` *)
           match%lwt Dream.receive ws with
           | None -> Dream.close_websocket ws
-          | Some msg -> process_player_action ws msg state agent)
+          | Some msg -> process_player_action ws msg state diff)
       | winner ->
+          Core_unix.sleep 1;
           let%lwt () = encode_csv [ "game_end"; winner ] |> Dream.send ws in
-          Dream.close_websocket ws)
+          process ws)
   | winner ->
+      Core_unix.sleep 1;
       let%lwt () = encode_csv [ "game_end"; winner ] |> Dream.send ws in
-      Dream.close_websocket ws
+      process ws
 
-let process_new_game ws msg =
+and process_new_game ws msg =
   (* game initialization *)
   let [ msg_type; game_mode; diff; block_mode; rows; cols ] =
     msg |> decode_csv
@@ -147,24 +156,16 @@ let process_new_game ws msg =
   assert (String.equal msg_type "new_game");
   assert (String.equal game_mode "player-vs-agent");
   assert (String.equal block_mode "none");
-  assert (String.equal diff "easy");
-  (* define agent *)
-  let agent =
-    ConnectFourEasy.best_action
-    (* match diff with
-       | easy -> ConnectFourEasy.best_action ~depth:6
-       | medium -> ConnectFourMedium.search ~depth:6
-       | hard -> ConnectFourHard.search ~depth:6 *)
-  in
+  (* assert (String.equal diff "easy"); *)
   let state =
     Connect4.initial_state (int_of_string rows) (int_of_string cols) 1
   in
   (* receive `player_action` *)
   match%lwt Dream.receive ws with
   | None -> Dream.close_websocket ws
-  | Some msg -> process_player_action ws msg state agent
+  | Some msg -> process_player_action ws msg state diff
 
-let process (ws : Dream.websocket) : unit Lwt.t =
+and process (ws : Dream.websocket) : unit Lwt.t =
   (* receive `new_game` *)
   match%lwt Dream.receive ws with
   | None -> Dream.close_websocket ws

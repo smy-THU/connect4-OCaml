@@ -85,6 +85,7 @@ let new_game = event => {
   | true => {
       renderBoard()
       enableNewGame := false
+      isPlayerTurn := true
 
       Js.log("=============================")
       Js.log2("gameMode        : ", gameMode.contents)

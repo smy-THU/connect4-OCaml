@@ -1,22 +1,90 @@
 (() => {
-  // node_modules/rescript/lib/es6/caml_int32.js
-  function div(x, y) {
-    if (y === 0) {
-      throw {
-        RE_EXN_ID: "Division_by_zero",
-        Error: new Error()
-      };
+  // node_modules/rescript/lib/es6/caml_array.js
+  function sub(x, offset, len) {
+    var result = new Array(len);
+    var j = 0;
+    var i = offset;
+    while (j < len) {
+      result[j] = x[i];
+      j = j + 1 | 0;
+      i = i + 1 | 0;
     }
-    return x / y | 0;
+    ;
+    return result;
   }
-  function mod_(x, y) {
-    if (y === 0) {
-      throw {
-        RE_EXN_ID: "Division_by_zero",
-        Error: new Error()
+
+  // node_modules/rescript/lib/es6/curry.js
+  function app(_f, _args) {
+    while (true) {
+      var args = _args;
+      var f = _f;
+      var init_arity = f.length;
+      var arity = init_arity === 0 ? 1 : init_arity;
+      var len = args.length;
+      var d = arity - len | 0;
+      if (d === 0) {
+        return f.apply(null, args);
+      }
+      if (d >= 0) {
+        return /* @__PURE__ */ function(f2, args2) {
+          return function(x) {
+            return app(f2, args2.concat([x]));
+          };
+        }(f, args);
+      }
+      _args = sub(args, arity, -d | 0);
+      _f = f.apply(null, sub(args, 0, arity));
+      continue;
+    }
+    ;
+  }
+  function _2(o, a0, a1) {
+    var arity = o.length;
+    if (arity === 2) {
+      return o(a0, a1);
+    } else {
+      switch (arity) {
+        case 1:
+          return app(o(a0), [a1]);
+        case 2:
+          return o(a0, a1);
+        case 3:
+          return function(param) {
+            return o(a0, a1, param);
+          };
+        case 4:
+          return function(param, param$1) {
+            return o(a0, a1, param, param$1);
+          };
+        case 5:
+          return function(param, param$1, param$2) {
+            return o(a0, a1, param, param$1, param$2);
+          };
+        case 6:
+          return function(param, param$1, param$2, param$3) {
+            return o(a0, a1, param, param$1, param$2, param$3);
+          };
+        case 7:
+          return function(param, param$1, param$2, param$3, param$4) {
+            return o(a0, a1, param, param$1, param$2, param$3, param$4);
+          };
+        default:
+          return app(o, [
+            a0,
+            a1
+          ]);
+      }
+    }
+  }
+  function __2(o) {
+    var arity = o.length;
+    if (arity === 2) {
+      return o;
+    } else {
+      return function(a0, a1) {
+        return _2(o, a0, a1);
       };
     }
-    return x % y;
   }
 
   // node_modules/rescript/lib/es6/caml_option.js
@@ -52,6 +120,38 @@
         BS_PRIVATE_NESTED_SOME_NONE: depth - 1 | 0
       };
     }
+  }
+
+  // node_modules/rescript/lib/es6/belt_Array.js
+  function reduceU(a, x, f) {
+    var r = x;
+    for (var i = 0, i_finish = a.length; i < i_finish; ++i) {
+      r = f(r, a[i]);
+    }
+    return r;
+  }
+  function reduce(a, x, f) {
+    return reduceU(a, x, __2(f));
+  }
+
+  // node_modules/rescript/lib/es6/caml_int32.js
+  function div(x, y) {
+    if (y === 0) {
+      throw {
+        RE_EXN_ID: "Division_by_zero",
+        Error: new Error()
+      };
+    }
+    return x / y | 0;
+  }
+  function mod_(x, y) {
+    if (y === 0) {
+      throw {
+        RE_EXN_ID: "Division_by_zero",
+        Error: new Error()
+      };
+    }
+    return x % y;
   }
 
   // node_modules/rescript/lib/es6/belt_Option.js
@@ -532,7 +632,7 @@
       var s_row = String(row);
       var s_col = String(col);
       isPlayerTurn.contents = false;
-      socket.send(s_row + "," + s_col);
+      socket.send("player_action," + s_row + "," + s_col);
       return;
     }
     window.alert("It's not your turn");
@@ -554,6 +654,7 @@
     var s_rows = String(rows);
     var s_cols = String(cols);
     var board = getExn(nullable_to_opt(document.getElementById("board")));
+    board.innerHTML = "";
     var board_style = getExn(asHtmlElement(board)).style;
     board_style.setProperty("grid-template-columns", "repeat(" + s_cols + ", 50px)", "");
     board_style.setProperty("grid-template-rows", "repeat(" + s_rows + ", 50px)", "");
@@ -582,6 +683,7 @@
     if (enableNewGame.contents) {
       renderBoard();
       enableNewGame.contents = false;
+      console.log("=============================");
       console.log("gameMode        : ", gameMode.contents);
       console.log("agentDifficulty : ", agentDifficulty.contents);
       console.log("blockMode       : ", blockMode.contents);
@@ -590,14 +692,25 @@
       console.log("-----------------------------");
       console.log("isPlayerTurn    : ", isPlayerTurn.contents);
       console.log("enableNewGame   : ", enableNewGame.contents);
-    } else {
-      window.alert("You can't start a new game now.");
+      console.log("=============================");
+      var param_list = [
+        gameMode.contents,
+        agentDifficulty.contents,
+        blockMode.contents,
+        String(boardRows.contents),
+        String(boardCols.contents)
+      ];
+      socket.send(reduce(param_list, "new_game", function(acc, x) {
+        return acc + "," + x;
+      }));
+      return;
     }
+    window.alert("You can't start a new game now.");
   }
   getExn(nullable_to_opt(document.getElementById("board-size-form"))).addEventListener("submit", new_game);
   function updateBoard(s_row, s_col, value) {
     var cell_id = "cell-r" + s_row + "-c" + s_col;
-    getExn(nullable_to_opt(document.getElementById(cell_id))).className = value + " cell";
+    getExn(nullable_to_opt(document.getElementById(cell_id))).className = "cell " + value;
   }
   socket.addEventListener("open", function(param) {
     console.log("Connected.");
@@ -612,18 +725,28 @@
         updateBoard(s_row, s_col, "agent-cell");
         isPlayerTurn.contents = true;
         return;
+      case "block_action":
+        var s_row$1 = getExn(data[1]);
+        var s_col$1 = getExn(data[2]);
+        updateBoard(s_row$1, s_col$1, "block-cell");
+        isPlayerTurn.contents = true;
+        return;
       case "game_end":
         var winner = getExn(data[1]);
-        window.alert("Game over! Winner: " + winner + ". You can start a new game now!");
+        if (winner === "tie") {
+          window.alert("Game over! It's a tie! You can start a new game now!");
+        } else {
+          window.alert("Game over! Winner: " + winner + ". You can start a new game now!");
+        }
         enableNewGame.contents = true;
         return;
       case "invalid_action":
         window.alert("You can't place here");
         return;
       case "player_action":
-        var s_row$1 = getExn(data[1]);
-        var s_col$1 = getExn(data[2]);
-        return updateBoard(s_row$1, s_col$1, "player-cell");
+        var s_row$2 = getExn(data[1]);
+        var s_col$2 = getExn(data[2]);
+        return updateBoard(s_row$2, s_col$2, "player-cell");
       default:
         console.log("???");
         return;

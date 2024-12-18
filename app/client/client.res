@@ -25,7 +25,7 @@ let handleCellClick = (row, col) => {
     let s_row = string_of_int(row)
     let s_col = string_of_int(col)
     isPlayerTurn := false
-    socket->WebSocket.sendText(`${s_row},${s_col}`)
+    socket->WebSocket.sendText(`player_action,${s_row},${s_col}`)
   }
 }
 
@@ -45,17 +45,12 @@ let renderBoard = () => {
   let s_rows = string_of_int(rows)
   let s_cols = string_of_int(cols)
   let board = document->Document.getElementById("board")->getExn
+  board->Element.setInnerHTML("")
   let board_style = board->Element.asHtmlElement->getExn->HtmlElement.style
-  board_style->CssStyleDeclaration.setProperty(
-    "grid-template-columns",
-    `repeat(${s_cols}, 50px)`,
-    "",
-  )
-  board_style->CssStyleDeclaration.setProperty(
-    "grid-template-rows",
-    `repeat(${s_rows}, 50px)`,
-    "",
-  )
+  let css_col_key = "grid-template-columns"
+  let css_row_key = "grid-template-rows"
+  board_style->CssStyleDeclaration.setProperty(css_col_key, `repeat(${s_cols}, 50px)`, "")
+  board_style->CssStyleDeclaration.setProperty(css_row_key, `repeat(${s_rows}, 50px)`, "")
   for i in 0 to rows * cols - 1 {
     let cell = createCell(i / cols, mod(i, cols))
     board->Element.appendChild(~child=cell)
@@ -91,6 +86,7 @@ let new_game = event => {
       renderBoard()
       enableNewGame := false
 
+      Js.log("=============================")
       Js.log2("gameMode        : ", gameMode.contents)
       Js.log2("agentDifficulty : ", agentDifficulty.contents)
       Js.log2("blockMode       : ", blockMode.contents)
@@ -99,6 +95,19 @@ let new_game = event => {
       Js.log("-----------------------------")
       Js.log2("isPlayerTurn    : ", isPlayerTurn.contents)
       Js.log2("enableNewGame   : ", enableNewGame.contents)
+      Js.log("=============================")
+
+      let param_list = [
+        gameMode.contents,
+        agentDifficulty.contents,
+        blockMode.contents,
+        string_of_int(boardRows.contents),
+        string_of_int(boardCols.contents),
+      ]
+
+      socket->WebSocket.sendText(
+        Belt.Array.reduce(param_list, "new_game", (acc, x) => `${acc},${x}`),
+      )
     }
   }
 }
@@ -113,7 +122,7 @@ let updateBoard = (s_row, s_col, value) => {
   document
   ->Document.getElementById(cell_id)
   ->getExn
-  ->Element.setClassName(`${value} cell`)
+  ->Element.setClassName(`cell ${value}`)
 }
 
 socket->WebSocket.addOpenListener(_ => {
@@ -138,10 +147,19 @@ socket->WebSocket.addMessageListener(event => {
       updateBoard(s_row, s_col, "agent-cell")
       isPlayerTurn := true
     }
+  | "block_action" => {
+      let s_row = data[1]->getExn
+      let s_col = data[2]->getExn
+      updateBoard(s_row, s_col, "block-cell")
+      isPlayerTurn := true
+    }
   | "invalid_action" => window->Window.alert("You can't place here")
   | "game_end" => {
       let winner = data[1]->getExn
-      window->Window.alert(`Game over! Winner: ${winner}. You can start a new game now!`)
+      switch winner {
+      | "tie" => window->Window.alert("Game over! It's a tie! You can start a new game now!")
+      | _ => window->Window.alert(`Game over! Winner: ${winner}. You can start a new game now!`)
+      }
       enableNewGame := true
     }
   | _ => Js.log("???")

@@ -29,5 +29,3 @@ val is_tie : int array -> bool
 (** [is_tie top] checks if the game is a tie.
     @param top An array representing the topmost filled position of each column.
     @return [true] if the game is a tie, [false] otherwise. *)
-
-val point_is_in : point_t -> board_t -> bool

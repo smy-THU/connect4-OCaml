@@ -26,9 +26,6 @@ type state = {
 }
 
 
-(* Initialize an empty board with specified dimensions *)
-let empty_board rows cols: board_t = 
-  Array.make_matrix rows cols 0
 
 
 (* Create the initial state with specified dimensions *)
@@ -39,7 +36,7 @@ let initial_state (h:int) (w:int) (player:player_t) : state =
     failwith "player not valid when initial state"
   else
   {
-    board = empty_board h w;
+    board = Utils.empty_board h w;
     current_player = player;
     h;
     w;

@@ -39,7 +39,7 @@ let initial_state (h:int) (w:int) (player:player_t) (ban_point : point_t): state
     failwith "board size invalid"
   else if player <> 1 || player <> 2 then
     failwith "player not valid when initial state"
-  else if Judge.point_is_in ban_point new_board then
+  else if Utils.point_is_in ban_point new_board then
     failwith "ban_point is not in board"
   else
     let (x, y) = ban_point in
@@ -59,14 +59,30 @@ let is_full (board : board_t) : bool =
   if Array.length board < 1 then 
     failwith "the board is invalid."
   else
-    Array.for_all (fun ele -> ele <> 0) board.(0)
+    let w = Utils.get_w board in
+    let ban_top_ls = List.filter (fun col -> board.(0).(col) = -1) (List.init w (fun x -> x)) in
+    if List.length ban_top_ls = 0 then
+      Array.for_all (fun ele -> ele <> 0) board.(0)
+    else
+      (* there are ban point on the 0th row of the board*)
+      let full_ban_ls = List.filter (fun col -> board.(1).(col) = 1 || board.(1).(col) = 2) ban_top_ls in
+      let is_full_col (col:int) : bool =
+        match board.(0).(col) with
+        | 0 -> false
+        | 1 -> true
+        | 2 -> true
+        | -1 -> if (List.mem col full_ban_ls) then true else false
+        | _ -> failwith "invalid point value on the board."
+      in
+      Array.for_all is_full_col board.(0)
 
 let is_empty (board : board_t) : bool =
-  let h = Array.length board in
+  let h = Utils.get_h board in
   if h < 1 then 
     failwith "the board is invalid."
   else
     Array.for_all (fun col -> col <> 1 && col <> 2) board.(h-1)
+
 
 let check_winner (board : board_t) (player : player_t) : bool =
   Judge.check_win_full board player
@@ -99,7 +115,7 @@ let evaluate (state : state) : float =
 (* Generate a list of valid actions (columns that are not full) *)
 let generate_actions (state : state) : action list =
   (* the list consists of the column number of ban_points on the 0th row*)
-  let ban_top_ls = List.filter (fun col -> state.board.(0).(col) = 1) (List.init state.w (fun x -> x)) in
+  let ban_top_ls = List.filter (fun col -> state.board.(0).(col) = -1) (List.init state.w (fun x -> x)) in
 
   (* normal situation: no ban point on the 0th row*)
   if List.length ban_top_ls = 0 then
@@ -110,7 +126,7 @@ let generate_actions (state : state) : action list =
     let all_actions = List.init state.w (fun x -> x) in
     let is_valid (col:int) : bool =
       state.board.(0).(col) = 0 ||
-      List.mem col ban_top_ls && List.mem col empty_ban_ls
+      (List.mem col ban_top_ls && List.mem col empty_ban_ls)
     in
     List.filter is_valid all_actions
 

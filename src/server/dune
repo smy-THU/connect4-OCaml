@@ -1,6 +1,6 @@
 (executable
  (name server)
- (libraries common dream core core_unix core_unix.sys_unix stdio)
+ (libraries dream judge core core_unix core_unix.sys_unix stdio)
  (preprocess
   (pps lwt_ppx)))
 

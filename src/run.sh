@@ -7,4 +7,6 @@ dune test && bisect-ppx-report html && bisect-ppx-report summary
 cd -
 
 echo "Launch live demo ..."
-dune exec ./bin/connect4.exe
+# dune exec ./bin/connect4.exe
+npm install
+npm start

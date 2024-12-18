@@ -18,14 +18,38 @@ let blockMode = ref("")
 let boardRows = ref(-1)
 let boardCols = ref(-1)
 
+let isColFull = s_col => {
+  let flag = ref(true)
+  let rows = boardRows.contents
+  for i in 0 to rows - 1 {
+    let s_row = string_of_int(i)
+    let cell_id = `cell-r${s_row}-c${s_col}`
+    let cell_class =
+      document
+      ->Document.getElementById(cell_id)
+      ->getExn
+      ->Element.getAttribute("class")
+      ->getExn
+
+    if cell_class == "cell" {
+      flag := false
+    }
+  }
+  flag.contents
+}
+
 let handleCellClick = (row, col) => {
   switch isPlayerTurn.contents {
   | false => window->Window.alert("It's not your turn")
   | true =>
     let s_row = string_of_int(row)
     let s_col = string_of_int(col)
-    isPlayerTurn := false
-    socket->WebSocket.sendText(`player_action,${s_row},${s_col}`)
+    switch isColFull(s_col) {
+    | true => window->Window.alert("This column is full")
+    | false =>
+      isPlayerTurn := false
+      socket->WebSocket.sendText(`player_action,${s_row},${s_col}`)
+    }
   }
 }
 
@@ -160,12 +184,11 @@ socket->WebSocket.addMessageListener(event => {
       updateBoard(s_row, s_col, "bonus-cell")
       isPlayerTurn := true
     }
-  | "invalid_action" => window->Window.alert("You can't place here")
   | "game_end" => {
       let winner = data[1]->getExn
       switch winner {
-      | "tie" => window->Window.alert("Game over! It's a tie! You can start a new game now!")
-      | _ => window->Window.alert(`Game over! Winner: ${winner}. You can start a new game now!`)
+      | "tie" => window->Window.alert("Tie!")
+      | _ => window->Window.alert(`${winner} Wins!`)
       }
       enableNewGame := true
     }

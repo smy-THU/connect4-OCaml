@@ -627,12 +627,29 @@
   var boardCols = {
     contents: -1
   };
+  function isColFull(s_col) {
+    var flag = true;
+    var rows = boardRows.contents;
+    for (var i = 0; i < rows; ++i) {
+      var s_row = String(i);
+      var cell_id = "cell-r" + s_row + "-c" + s_col;
+      var cell_class = getExn(nullable_to_opt(getExn(nullable_to_opt(document.getElementById(cell_id))).getAttribute("class")));
+      if (cell_class === "cell") {
+        flag = false;
+      }
+    }
+    return flag;
+  }
   function handleCellClick(row, col) {
     if (isPlayerTurn.contents) {
       var s_row = String(row);
       var s_col = String(col);
-      isPlayerTurn.contents = false;
-      socket.send("player_action," + s_row + "," + s_col);
+      if (isColFull(s_col)) {
+        window.alert("This column is full");
+      } else {
+        isPlayerTurn.contents = false;
+        socket.send("player_action," + s_row + "," + s_col);
+      }
       return;
     }
     window.alert("It's not your turn");
@@ -746,9 +763,6 @@
           window.alert("Game over! Winner: " + winner + ". You can start a new game now!");
         }
         enableNewGame.contents = true;
-        return;
-      case "invalid_action":
-        window.alert("You can't place here");
         return;
       case "player_action":
         var s_row$3 = getExn(data[1]);

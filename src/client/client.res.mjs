@@ -46,12 +46,31 @@ var boardCols = {
   contents: -1
 };
 
+function isColFull(s_col) {
+  var flag = true;
+  var rows = boardRows.contents;
+  for(var i = 0; i < rows; ++i){
+    var s_row = String(i);
+    var cell_id = "cell-r" + s_row + "-c" + s_col;
+    var cell_class = Belt_Option.getExn(Caml_option.nullable_to_opt(Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById(cell_id))).getAttribute("class")));
+    if (cell_class === "cell") {
+      flag = false;
+    }
+    
+  }
+  return flag;
+}
+
 function handleCellClick(row, col) {
   if (isPlayerTurn.contents) {
     var s_row = String(row);
     var s_col = String(col);
-    isPlayerTurn.contents = false;
-    socket.send("player_action," + s_row + "," + s_col);
+    if (isColFull(s_col)) {
+      window.alert("This column is full");
+    } else {
+      isPlayerTurn.contents = false;
+      socket.send("player_action," + s_row + "," + s_col);
+    }
     return ;
   }
   window.alert("It's not your turn");
@@ -173,9 +192,6 @@ socket.addEventListener("message", (function ($$event) {
               }
               enableNewGame.contents = true;
               return ;
-          case "invalid_action" :
-              window.alert("You can't place here");
-              return ;
           case "player_action" :
               var s_row$3 = Belt_Option.getExn(data[1]);
               var s_col$3 = Belt_Option.getExn(data[2]);
@@ -201,6 +217,7 @@ export {
   blockMode ,
   boardRows ,
   boardCols ,
+  isColFull ,
   handleCellClick ,
   createCell ,
   renderBoard ,

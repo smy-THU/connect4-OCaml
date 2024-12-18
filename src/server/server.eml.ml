@@ -91,6 +91,12 @@ let encode_csv (line : string list) : string = line |> String.concat ~sep:","
 module C4Minimax = Minimax.Make (Connect4)
 module C4Alpha = Alpha_beta.Make (Connect4)
 module C4Mcts = Mcts.Make (Connect4)
+module C4BanMinimax = Minimax.Make (Connect4_ban)
+module C4BanAlpha = Alpha_beta.Make (Connect4_ban)
+module C4BanMcts = Mcts.Make (Connect4_ban)
+module C4BonusMinimax = Minimax.Make (Connect4_ban)
+module C4BonusAlpha = Alpha_beta.Make (Connect4_ban)
+module C4BonusMcts = Mcts.Make (Connect4_ban)
 
 let state_to_winner state =
   let is_end = Connect4.is_terminal state in
@@ -103,7 +109,7 @@ let state_to_winner state =
       | _ -> "continue")
   | false -> "continue"
 
-let rec process_player_action ws msg state diff =
+let rec process_player_action ws msg state diff block_mode =
   (* player move *)
   let [ msg_type; player_row; player_col ] = msg |> decode_csv in
   assert (String.equal msg_type "player_action");
@@ -138,7 +144,7 @@ let rec process_player_action ws msg state diff =
           (* receive new `player_action` *)
           match%lwt Dream.receive ws with
           | None -> Dream.close_websocket ws
-          | Some msg -> process_player_action ws msg state diff)
+          | Some msg -> process_player_action ws msg state diff block_mode)
       | winner ->
           Core_unix.sleep 1;
           let%lwt () = encode_csv [ "game_end"; winner ] |> Dream.send ws in
@@ -155,15 +161,36 @@ and process_new_game ws msg =
   in
   assert (String.equal msg_type "new_game");
   assert (String.equal game_mode "player-vs-agent");
-  assert (String.equal block_mode "none");
-  (* assert (String.equal diff "easy"); *)
+  (* assert (String.equal block_mode "none"); *)
+  let i_rows = int_of_string rows in
+  let i_cols = int_of_string cols in
   let state =
-    Connect4.initial_state (int_of_string rows) (int_of_string cols) 1
+    match block_mode with
+    | "none" -> Connect4.initial_state i_rows i_cols 1
+    (* | _ -> (
+        let rand_col = Random.int i_cols in
+        let rand_row = Random.int i_rows in
+        let s_rand_col = string_of_int rand_col in
+        let s_rand_row = string_of_int rand_row in
+        match block_mode with
+        | "random" ->
+            let%lwt () =
+              encode_csv [ "block_action"; s_rand_row; s_rand_col ]
+              |> Dream.send ws
+            in
+            Connect4_ban.initial_state i_rows i_cols 1 (rand_row, rand_col)
+        | "reward" ->
+            let%lwt () =
+              encode_csv [ "bonus_action"; s_rand_row; s_rand_col ]
+              |> Dream.send ws
+            in
+            Connect4_bonus.initial_state i_rows i_cols 1 (rand_row, rand_col)) *)
+    | _ -> failwith "invalid block mode"
   in
   (* receive `player_action` *)
   match%lwt Dream.receive ws with
   | None -> Dream.close_websocket ws
-  | Some msg -> process_player_action ws msg state diff
+  | Some msg -> process_player_action ws msg state diff block_mode
 
 and process (ws : Dream.websocket) : unit Lwt.t =
   (* receive `new_game` *)

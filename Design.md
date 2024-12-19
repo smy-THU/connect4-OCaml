@@ -15,5 +15,4 @@ We are going to implement a interactive web Connect4 game, where the player can 
 - Demo usage: enter [demo/dream](demo/dream) and run [run.sh](demo/dream/run.sh)
 
 ## Module Type Declarations
-
-## Implementation Plan
+There are 3 functors

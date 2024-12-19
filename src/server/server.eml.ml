@@ -85,13 +85,13 @@ and process_agent_action ws msg state diff =
     match (state, diff) with
     | C_st state, "easy" -> C4Minimax.best_action state 5
     | C_st state, "medium" -> C4Alpha.search state 8
-    | C_st state, "hard" -> C4Mcts.search state 10000 0.7
+    | C_st state, "hard" -> C4Mcts.search state 100000 0.7
     | C_ban_st state, "easy" -> C4BanMinimax.best_action state 5
     | C_ban_st state, "medium" -> C4BanAlpha.search state 8
-    | C_ban_st state, "hard" -> C4BanMcts.search state 10000 0.7
+    | C_ban_st state, "hard" -> C4BanMcts.search state 100000 0.7
     | C_bonus_st state, "easy" -> C4BonusMinimax.best_action state 5
     | C_bonus_st state, "medium" -> C4BonusAlpha.search state 8
-    | C_bonus_st state, "hard" -> C4BonusMcts.search state 10000 0.7
+    | C_bonus_st state, "hard" -> C4BonusMcts.search state 100000 0.7
     | _ -> failwith "invalid difficulty"
   in
   print_endline @@ "Agent chooses column: " ^ string_of_int agent_action;

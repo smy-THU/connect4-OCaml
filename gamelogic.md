@@ -34,7 +34,6 @@ If neither player achieves this by the time the grid is completely filled, the g
 Some configurations of Connect-Four grids have **perfect strategies** that guarantee one player's victory. For example:
 
 - On a **6x7 board**, a well-known algorithm ensures that the first player (Player A) can force a win.
-- In 1987, American computer scientist **James Dow Allen** introduced this winning strategy. Around the same time, Dutch computer scientist **Victor Allis** independently developed a similar solution and published research on the topic.
 
 To prevent such deterministic outcomes and ensure meaningful evaluations, we have introduced **enhanced rules** for this game.
 
@@ -49,6 +48,9 @@ To prevent such deterministic outcomes and ensure meaningful evaluations, we hav
 2. **Restricted Cells**:
    - After the grid is generated, **one random cell** is marked as a **forbidden position**, indicated by a red "X" on the board.
    - Players cannot place a piece in this cell. If a piece is dropped into the column containing the forbidden position, the next available position is adjusted accordingly.
+
+3. **Bonus Cell**
+    - In the bonus cell game mode, we create a random bonus cell on the board. The player who put piece on the bonus cell can immediately put a ban point for both players as a piece.
 
 Given these modifications, the task of our agent is to develop a strategy that is **adaptive and versatile**.
 

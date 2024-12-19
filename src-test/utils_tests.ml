@@ -19,7 +19,8 @@ let test_point_is_in _ =
   assert_equal true (point_is_in (5, 6) board);
   assert_equal false (point_is_in (6, 6) board);
   assert_equal false (point_is_in (-1, 0) board);
-  assert_equal false (point_is_in (0, 7) board)
+  assert_equal false (point_is_in (0, 7) board);
+  assert_equal false (point_is_in (7, -1) board)
 
 let test_empty_board _ =
   let rows = 6 and cols = 7 in

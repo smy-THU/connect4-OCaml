@@ -4,8 +4,7 @@ open OUnit2
 module C4 = Connect4
 
 (* Helper function to create a test state *)
-let create_test_state () =
-  C4.initial_state 6 7 1
+let create_test_state () = C4.initial_state 6 7 1
 
 let test_initial_state _ =
   let state = C4.initial_state 6 7 1 in
@@ -41,7 +40,7 @@ let test_apply_action _ =
 let test_generate_actions _ =
   let state = create_test_state () in
   let actions = C4.generate_actions state in
-  assert_equal actions [0; 1; 2; 3; 4; 5; 6];
+  assert_equal actions [ 0; 1; 2; 3; 4; 5; 6 ];
   let full_column = Array.make_matrix 6 7 1 in
   let full_state = { state with C4.board = full_column } in
   let no_actions = C4.generate_actions full_state in
@@ -58,23 +57,22 @@ let test_is_terminal _ =
   let state = C4.apply_action state 3 in
   let state = C4.apply_action state 2 in
   let state = C4.apply_action state 3 in
-  
+
   assert_bool "Winning board should be terminal" (C4.is_terminal state);
 
   let full_board = Array.make_matrix 6 7 1 in
-  let full_state = {state with C4.board = full_board} in
+  let full_state = { state with C4.board = full_board } in
   assert_bool "full board should be terminal" (C4.is_terminal full_state)
 
-
 let series =
-  "Connect4 Tests" >::: [
-    "test_initial_state" >:: test_initial_state;
-    "test_is_full" >:: test_is_full;
-    "test_check_winner" >:: test_check_winner;
-    "test_apply_action" >:: test_apply_action;
-    "test_generate_actions" >:: test_generate_actions;
-    "test_is_terminal" >:: test_is_terminal;
-  ]
+  "Connect4 Tests"
+  >::: [
+         "test_initial_state" >:: test_initial_state;
+         "test_is_full" >:: test_is_full;
+         "test_check_winner" >:: test_check_winner;
+         "test_apply_action" >:: test_apply_action;
+         "test_generate_actions" >:: test_generate_actions;
+         "test_is_terminal" >:: test_is_terminal;
+       ]
 
-let () =
-  run_test_tt_main series
+let () = run_test_tt_main series

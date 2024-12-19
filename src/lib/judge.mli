@@ -20,9 +20,7 @@ val machine_win : int -> int -> int -> int -> int array array -> bool
     @param board The game board represented as a 2D array.
     @return [true] if the machine has won, [false] otherwise. *)
 
-
 val check_win : int -> int -> int -> int -> int array array -> int -> bool
-
 val check_win_full : board_t -> player_t -> bool
 
 val is_tie : int array -> bool

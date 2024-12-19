@@ -36,13 +36,13 @@ let test_switch_player _ =
   assert_raises (Failure "player invalid") (fun () -> switch_player 3)
 
 let series =
-  "Utils Test Suite" >::: [
-    "test_get_h" >:: test_get_h;
-    "test_get_w" >:: test_get_w;
-    "test_point_is_in" >:: test_point_is_in;
-    "test_empty_board" >:: test_empty_board;
-    "test_switch_player" >:: test_switch_player;
-  ]
+  "Utils Test Suite"
+  >::: [
+         "test_get_h" >:: test_get_h;
+         "test_get_w" >:: test_get_w;
+         "test_point_is_in" >:: test_point_is_in;
+         "test_empty_board" >:: test_empty_board;
+         "test_switch_player" >:: test_switch_player;
+       ]
 
-let () =
-  run_test_tt_main series
+let () = run_test_tt_main series

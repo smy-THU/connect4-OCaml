@@ -84,14 +84,14 @@ and process_agent_action ws msg state diff =
     (* different agent *)
     match (state, diff) with
     | C_st state, "easy" -> C4Minimax.best_action state 5
-    | C_st state, "medium" -> C4Alpha.search state 8
-    | C_st state, "hard" -> C4Mcts.search state 100000 0.7
+    | C_st state, "medium" -> C4Alpha.search state 7
+    | C_st state, "hard" -> C4Mcts.search state 1000000 0.8
     | C_ban_st state, "easy" -> C4BanMinimax.best_action state 5
-    | C_ban_st state, "medium" -> C4BanAlpha.search state 8
-    | C_ban_st state, "hard" -> C4BanMcts.search state 100000 0.7
+    | C_ban_st state, "medium" -> C4BanAlpha.search state 7
+    | C_ban_st state, "hard" -> C4BanMcts.search state 1000000 0.8
     | C_bonus_st state, "easy" -> C4BonusMinimax.best_action state 5
-    | C_bonus_st state, "medium" -> C4BonusAlpha.search state 8
-    | C_bonus_st state, "hard" -> C4BonusMcts.search state 100000 0.7
+    | C_bonus_st state, "medium" -> C4BonusAlpha.search state 7
+    | C_bonus_st state, "hard" -> C4BonusMcts.search state 1000000 0.8
     | _ -> failwith "invalid difficulty"
   in
   print_endline @@ "Agent chooses column: " ^ string_of_int agent_action;
@@ -148,8 +148,7 @@ and process_new_game ws msg =
       shared_commands (C_st state) first_actor
   | _ -> (
       let rand_col = Random.int i_cols in
-      (* let rand_row = Random.int i_rows in *)
-      let rand_row = i_rows - 1 in
+      let rand_row = Random.int i_rows in
       let s_rand_col = string_of_int rand_col in
       let s_rand_row = string_of_int rand_row in
       let rand_pt = (rand_row, rand_col) in

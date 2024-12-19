@@ -120,6 +120,19 @@ function new_game($$event) {
   var block_element = Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById("block-mode")));
   var block_element$1 = Belt_Option.getExn(Webapi__Dom__HtmlSelectElement.ofElement(block_element));
   blockMode.contents = block_element$1.value;
+  var act_element = Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById("who-acts-first")));
+  var act_element$1 = Belt_Option.getExn(Webapi__Dom__HtmlSelectElement.ofElement(act_element));
+  var match = act_element$1.value;
+  switch (match) {
+    case "agent" :
+        isPlayerTurn.contents = false;
+        break;
+    case "player" :
+        isPlayerTurn.contents = true;
+        break;
+    default:
+      
+  }
   var row_element = Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById("board-rows")));
   var row_element$1 = Belt_Option.getExn(Webapi__Dom__HtmlInputElement.ofElement(row_element));
   boardRows.contents = Caml_format.int_of_string(row_element$1.value);
@@ -129,7 +142,6 @@ function new_game($$event) {
   if (enableNewGame.contents) {
     renderBoard();
     enableNewGame.contents = false;
-    isPlayerTurn.contents = true;
     console.log("=============================");
     console.log("gameMode        : ", gameMode.contents);
     console.log("agentDifficulty : ", agentDifficulty.contents);
@@ -144,6 +156,7 @@ function new_game($$event) {
       gameMode.contents,
       agentDifficulty.contents,
       blockMode.contents,
+      PervasivesU.string_of_bool(isPlayerTurn.contents),
       String(boardRows.contents),
       String(boardCols.contents)
     ];
@@ -163,15 +176,17 @@ function updateBoard(s_row, s_col, value) {
   var cell_id = "cell-r" + s_row + "-c" + s_col;
   var cell_element = Belt_Option.getExn(Caml_option.nullable_to_opt(document.getElementById(cell_id)));
   var is_bonus = Belt_Option.getExn(Caml_option.nullable_to_opt(cell_element.getAttribute("class"))) === "cell bonus-cell";
+  var s_player_turn = PervasivesU.string_of_bool(isPlayerTurn.contents);
+  var s_to_block = PervasivesU.string_of_bool(toBlock.contents);
   if (blockMode.contents === "reward" && toBlock.contents === true) {
     cell_element.className = "cell block-cell";
-    console.log("toBlock: " + PervasivesU.string_of_bool(toBlock.contents) + "->false");
+    console.log("toBlock: " + s_to_block + "->false");
     toBlock.contents = false;
     if (value === "player-cell") {
-      console.log("isPlayerTurn: " + PervasivesU.string_of_bool(isPlayerTurn.contents) + "->false");
+      console.log("isPlayerTurn: " + s_player_turn + "->false");
       isPlayerTurn.contents = false;
     } else if (value === "agent-cell") {
-      console.log("isPlayerTurn: " + PervasivesU.string_of_bool(isPlayerTurn.contents) + "->true");
+      console.log("isPlayerTurn: " + s_player_turn + "->true");
       isPlayerTurn.contents = true;
     }
     
@@ -179,24 +194,24 @@ function updateBoard(s_row, s_col, value) {
     cell_element.className = "cell " + value;
     if (is_bonus && blockMode.contents === "reward") {
       if (value === "player-cell") {
-        console.log("isPlayerTurn: " + PervasivesU.string_of_bool(isPlayerTurn.contents) + "->true");
+        console.log("isPlayerTurn: " + s_player_turn + "->true");
         isPlayerTurn.contents = true;
       } else if (value === "agent-cell") {
-        console.log("isPlayerTurn: " + PervasivesU.string_of_bool(isPlayerTurn.contents) + "->false");
+        console.log("isPlayerTurn: " + s_player_turn + "->false");
         isPlayerTurn.contents = false;
       }
       
     } else if (value === "player-cell") {
-      console.log("isPlayerTurn: " + PervasivesU.string_of_bool(isPlayerTurn.contents) + "->false");
+      console.log("isPlayerTurn: " + s_player_turn + "->false");
       isPlayerTurn.contents = false;
     } else if (value === "agent-cell") {
-      console.log("isPlayerTurn: " + PervasivesU.string_of_bool(isPlayerTurn.contents) + "->true");
+      console.log("isPlayerTurn: " + s_player_turn + "->true");
       isPlayerTurn.contents = true;
     }
     
   }
   if (is_bonus && blockMode.contents === "reward" && toBlock.contents === false) {
-    console.log("toBlock: " + PervasivesU.string_of_bool(toBlock.contents) + "->true");
+    console.log("toBlock: " + s_to_block + "->true");
     toBlock.contents = true;
     return ;
   }
@@ -218,15 +233,11 @@ socket.addEventListener("message", (function ($$event) {
           case "block_action" :
               var s_row$1 = Belt_Option.getExn(data[1]);
               var s_col$1 = Belt_Option.getExn(data[2]);
-              updateBoard(s_row$1, s_col$1, "block-cell");
-              isPlayerTurn.contents = true;
-              return ;
+              return updateBoard(s_row$1, s_col$1, "block-cell");
           case "bonus_action" :
               var s_row$2 = Belt_Option.getExn(data[1]);
               var s_col$2 = Belt_Option.getExn(data[2]);
-              updateBoard(s_row$2, s_col$2, "bonus-cell");
-              isPlayerTurn.contents = true;
-              return ;
+              return updateBoard(s_row$2, s_col$2, "bonus-cell");
           case "game_end" :
               var winner = Belt_Option.getExn(data[1]);
               if (winner === "tie") {
@@ -235,7 +246,6 @@ socket.addEventListener("message", (function ($$event) {
                 window.alert(winner + " Wins!");
               }
               enableNewGame.contents = true;
-              isPlayerTurn.contents = false;
               return ;
           case "player_action" :
               var s_row$3 = Belt_Option.getExn(data[1]);

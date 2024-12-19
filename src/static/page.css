@@ -53,6 +53,10 @@ h1 {
   max-width: fit-content;
 }
 
+#game-mode-container {
+  display: none;
+  margin-top: 10px;
+}
 #agent-difficulty-container {
   display: block;
   margin-top: 10px;

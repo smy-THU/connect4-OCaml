@@ -105,6 +105,7 @@ and process_agent_action ws msg state diff =
 
 and process_player_action ws msg state diff =
   (* player move *)
+  print_endline "Player is thinking...";
   let [ msg_type; player_row; player_col ] = msg |> decode_csv in
   let i_player_col = int_of_string player_col in
   assert (String.equal msg_type "player_action");
@@ -118,57 +119,70 @@ and process_player_action ws msg state diff =
 
 and process_new_game ws msg =
   (* game initialization *)
-  let [ msg_type; game_mode; diff; block_mode; rows; cols ] =
+  let [ msg_type; game_mode; diff; block_mode; player_turn; rows; cols ] =
     msg |> decode_csv
   in
   assert (String.equal msg_type "new_game");
   assert (String.equal game_mode "player-vs-agent");
   let i_rows = int_of_string rows in
   let i_cols = int_of_string cols in
-  let shared_commands state =
-    (* receive `player_action` *)
-    match%lwt Dream.receive ws with
-    | None -> Dream.close_websocket ws
-    | Some msg -> process_player_action ws msg state diff
+  let first_actor =
+    match bool_of_string player_turn with true -> 1 | false -> 2
+  in
+  print_endline @@ string_of_int first_actor ^ " goes first";
+  let shared_commands state first_actor =
+    print_endline @@ "first_actor: " ^ string_of_int first_actor;
+    match first_actor with
+    | 1 -> (
+        match%lwt Dream.receive ws with
+        | None -> Dream.close_websocket ws
+        | Some msg -> process_player_action ws msg state diff)
+    | 2 -> process_agent_action ws msg state diff
+    | _ -> failwith "invalid first_actor"
   in
   (* assert (String.equal block_mode "none"); *)
   match block_mode with
   | "none" ->
-      let state = Connect4.initial_state i_rows i_cols 1 in
-      shared_commands (C_st state)
+      print_endline "board_mode: none";
+      let state = Connect4.initial_state i_rows i_cols first_actor in
+      shared_commands (C_st state) first_actor
   | _ -> (
       let rand_col = Random.int i_cols in
       (* let rand_row = Random.int i_rows in *)
       let rand_row = i_rows - 1 in
       let s_rand_col = string_of_int rand_col in
       let s_rand_row = string_of_int rand_row in
-      print_endline s_rand_col;
-      print_endline s_rand_row;
+      let rand_pt = (rand_row, rand_col) in
+      print_endline @@ "rand_pt: (" ^ s_rand_col ^ ", " ^ s_rand_row ^ ")";
       match block_mode with
       | "random" ->
-          let state =
-            Connect4_ban.initial_state i_rows i_cols 1 (rand_row, rand_col)
-          in
+          print_endline "board_mode: random";
           let%lwt () =
             encode_csv [ "block_action"; s_rand_row; s_rand_col ]
             |> Dream.send ws
           in
-          shared_commands (C_ban_st state)
-      | "reward" ->
           let state =
-            Connect4_bonus.initial_state i_rows i_cols 1 (rand_row, rand_col)
+            Connect4_ban.initial_state i_rows i_cols first_actor rand_pt
           in
+          shared_commands (C_ban_st state) first_actor
+      | "reward" ->
+          print_endline "board_mode: reward";
           let%lwt () =
             encode_csv [ "bonus_action"; s_rand_row; s_rand_col ]
             |> Dream.send ws
           in
-          shared_commands (C_bonus_st state))
+          let state =
+            Connect4_bonus.initial_state i_rows i_cols first_actor rand_pt
+          in
+          shared_commands (C_bonus_st state) first_actor)
 
 and process (ws : Dream.websocket) : unit Lwt.t =
   (* receive `new_game` *)
   match%lwt Dream.receive ws with
   | None -> Dream.close_websocket ws
-  | Some msg -> process_new_game ws msg
+  | Some msg ->
+      print_endline msg;
+      process_new_game ws msg
 
 let () =
   Dream.run @@ Dream.logger

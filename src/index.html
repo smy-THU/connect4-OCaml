@@ -13,7 +13,7 @@
 
     <form id="board-size-form">
       <!-- Game Mode -->
-      <div>
+      <div id="game-mode-container">
         <strong>Game Mode:</strong><br />
         <select id="game-mode" name="game-mode">
           <option value="player-vs-agent">Player vs Agent</option>
@@ -25,9 +25,9 @@
       <div id="agent-difficulty-container">
         <strong>Agent Difficulty:</strong><br />
         <select id="agent-difficulty" name="agent-difficulty">
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
+          <option value="hard">Hard (Monte-Carlo Tree Search)</option>
+          <option value="medium">Medium (Alpha Beta Pruning)</option>
+          <option value="easy">Easy (Minimax Algorithm)</option>
         </select>
       </div>
 
@@ -35,9 +35,18 @@
       <div>
         <strong>Block Mode:</strong><br />
         <select id="block-mode" name="block-mode">
-          <option value="none">No Block</option>
-          <option value="random">Random Block</option>
-          <option value="reward">Reward Block</option>
+          <option value="reward">Reward (Who takes reward point can place block)</option>
+          <option value="random">Random (Given a random block)</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+
+      <!-- Who Acts First -->
+      <div>
+        <strong>Who Acts First:</strong><br />
+        <select id="who-acts-first" name="who-acts-first">
+          <option value="agent">Agent</option>
+          <option value="player">Player</option>
         </select>
       </div>
 
@@ -52,6 +61,7 @@
             name="board-rows"
             min="6"
             max="12"
+            value="6"
             required
           />
         </label>
@@ -63,6 +73,7 @@
             name="board-cols"
             min="6"
             max="12"
+            value="6"
             required
           />
         </label>

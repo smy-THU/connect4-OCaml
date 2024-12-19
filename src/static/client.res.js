@@ -703,6 +703,18 @@
     var block_element = getExn(nullable_to_opt(document.getElementById("block-mode")));
     var block_element$1 = getExn(ofElement2(block_element));
     blockMode.contents = block_element$1.value;
+    var act_element = getExn(nullable_to_opt(document.getElementById("who-acts-first")));
+    var act_element$1 = getExn(ofElement2(act_element));
+    var match = act_element$1.value;
+    switch (match) {
+      case "agent":
+        isPlayerTurn.contents = false;
+        break;
+      case "player":
+        isPlayerTurn.contents = true;
+        break;
+      default:
+    }
     var row_element = getExn(nullable_to_opt(document.getElementById("board-rows")));
     var row_element$1 = getExn(ofElement(row_element));
     boardRows.contents = int_of_string(row_element$1.value);
@@ -712,7 +724,6 @@
     if (enableNewGame.contents) {
       renderBoard();
       enableNewGame.contents = false;
-      isPlayerTurn.contents = true;
       console.log("=============================");
       console.log("gameMode        : ", gameMode.contents);
       console.log("agentDifficulty : ", agentDifficulty.contents);
@@ -727,6 +738,7 @@
         gameMode.contents,
         agentDifficulty.contents,
         blockMode.contents,
+        string_of_bool(isPlayerTurn.contents),
         String(boardRows.contents),
         String(boardCols.contents)
       ];
@@ -744,37 +756,39 @@
     var cell_id = "cell-r" + s_row + "-c" + s_col;
     var cell_element = getExn(nullable_to_opt(document.getElementById(cell_id)));
     var is_bonus = getExn(nullable_to_opt(cell_element.getAttribute("class"))) === "cell bonus-cell";
+    var s_player_turn = string_of_bool(isPlayerTurn.contents);
+    var s_to_block = string_of_bool(toBlock.contents);
     if (blockMode.contents === "reward" && toBlock.contents === true) {
       cell_element.className = "cell block-cell";
-      console.log("toBlock: " + string_of_bool(toBlock.contents) + "->false");
+      console.log("toBlock: " + s_to_block + "->false");
       toBlock.contents = false;
       if (value === "player-cell") {
-        console.log("isPlayerTurn: " + string_of_bool(isPlayerTurn.contents) + "->false");
+        console.log("isPlayerTurn: " + s_player_turn + "->false");
         isPlayerTurn.contents = false;
       } else if (value === "agent-cell") {
-        console.log("isPlayerTurn: " + string_of_bool(isPlayerTurn.contents) + "->true");
+        console.log("isPlayerTurn: " + s_player_turn + "->true");
         isPlayerTurn.contents = true;
       }
     } else {
       cell_element.className = "cell " + value;
       if (is_bonus && blockMode.contents === "reward") {
         if (value === "player-cell") {
-          console.log("isPlayerTurn: " + string_of_bool(isPlayerTurn.contents) + "->true");
+          console.log("isPlayerTurn: " + s_player_turn + "->true");
           isPlayerTurn.contents = true;
         } else if (value === "agent-cell") {
-          console.log("isPlayerTurn: " + string_of_bool(isPlayerTurn.contents) + "->false");
+          console.log("isPlayerTurn: " + s_player_turn + "->false");
           isPlayerTurn.contents = false;
         }
       } else if (value === "player-cell") {
-        console.log("isPlayerTurn: " + string_of_bool(isPlayerTurn.contents) + "->false");
+        console.log("isPlayerTurn: " + s_player_turn + "->false");
         isPlayerTurn.contents = false;
       } else if (value === "agent-cell") {
-        console.log("isPlayerTurn: " + string_of_bool(isPlayerTurn.contents) + "->true");
+        console.log("isPlayerTurn: " + s_player_turn + "->true");
         isPlayerTurn.contents = true;
       }
     }
     if (is_bonus && blockMode.contents === "reward" && toBlock.contents === false) {
-      console.log("toBlock: " + string_of_bool(toBlock.contents) + "->true");
+      console.log("toBlock: " + s_to_block + "->true");
       toBlock.contents = true;
       return;
     }
@@ -793,15 +807,11 @@
       case "block_action":
         var s_row$1 = getExn(data[1]);
         var s_col$1 = getExn(data[2]);
-        updateBoard(s_row$1, s_col$1, "block-cell");
-        isPlayerTurn.contents = true;
-        return;
+        return updateBoard(s_row$1, s_col$1, "block-cell");
       case "bonus_action":
         var s_row$2 = getExn(data[1]);
         var s_col$2 = getExn(data[2]);
-        updateBoard(s_row$2, s_col$2, "bonus-cell");
-        isPlayerTurn.contents = true;
-        return;
+        return updateBoard(s_row$2, s_col$2, "bonus-cell");
       case "game_end":
         var winner = getExn(data[1]);
         if (winner === "tie") {
@@ -810,7 +820,6 @@
           window.alert(winner + " Wins!");
         }
         enableNewGame.contents = true;
-        isPlayerTurn.contents = false;
         return;
       case "player_action":
         var s_row$3 = getExn(data[1]);

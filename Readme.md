@@ -17,13 +17,13 @@ This repo implements a web-based Gravity Connect-4 with [OCaml](https://ocaml.or
 ## 🛠️ Usage 🛠️
 
 ```sh
-cd src
 dune clean && dune build
 dune test && bisect-ppx-report html # optional
+cd src
 npm install
 npm run start
 ```
-then visit http://localhost:8080 to play the game! 🤩
+then visit http://localhost:8080 to play the game! 
 
 ## ✨ Features ✨
 
@@ -46,3 +46,22 @@ then visit http://localhost:8080 to play the game! 🤩
 - **Larger Boards**: Explore endless strategies and more thrilling challenges!  
 
 🌟 **Your Perfect Blend of Strategy, Fun, and Competition Awaits!** 🌟 
+
+## Game Theory Library
+In "./src/lib", there are 3 general functors (minimax, alpha_beta and mcts) implementing 3 different algorithms for games involving 2 competitive players. 
+
+They can be allpied to any Game compatible with Game Type and get the agent for that game.
+
+## Command Line executables
+In "./src", there are several executables to play the connect4 game with agent. 
+For example, you can use 
+```sh
+dune exec ./src/play_bonus_mcts.exe
+```
+to execute the command line game for BONUS playmode versus an agent based on MCTS.
+
+Besides, you can use
+```sh
+dune exec ./src/pvp_bonus.ml
+```
+to execute the pvp game mode.

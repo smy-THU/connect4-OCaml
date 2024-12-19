@@ -50,12 +50,16 @@ let test_generate_actions _ =
 let test_is_terminal _ =
   let state = create_test_state () in
   assert_bool "Empty board should not be terminal" (not (C4.is_terminal state));
-  let board = state.C4.board in
-  for i = 0 to 3 do
-    board.(5).(i) <- 1
-  done;
-  let winning_state = { state with C4.board = board } in
-  assert_bool "Winning board should be terminal" (C4.is_terminal winning_state);
+
+  let state = C4.apply_action state 3 in
+  let state = C4.apply_action state 2 in
+  let state = C4.apply_action state 3 in
+  let state = C4.apply_action state 2 in
+  let state = C4.apply_action state 3 in
+  let state = C4.apply_action state 2 in
+  let state = C4.apply_action state 3 in
+  
+  assert_bool "Winning board should be terminal" (C4.is_terminal state);
 
   let full_board = Array.make_matrix 6 7 1 in
   let full_state = {state with C4.board = full_board} in

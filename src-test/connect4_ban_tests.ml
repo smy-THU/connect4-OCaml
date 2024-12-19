@@ -64,10 +64,14 @@ let test_is_terminal_terminal _ =
   let h = 6 in
   let w = 7 in
   let state = initial_state h w 1 (3, 4) in
-  state.board.(5).(3) <- 1;
-  state.board.(4).(3) <- 1;
-  state.board.(3).(3) <- 1;
-  state.board.(2).(3) <- 1;
+  let state = apply_action state 2 in
+  let state = apply_action state 3 in
+  let state = apply_action state 2 in
+  let state = apply_action state 3 in
+  let state = apply_action state 2 in
+  let state = apply_action state 3 in
+  let state = apply_action state 2 in
+
   assert_equal (is_terminal state) true
 
 let test_is_terminal_not_terminal _ =

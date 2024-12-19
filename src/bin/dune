@@ -25,3 +25,10 @@
  (libraries core connect4_bonus mcts)
  (preprocess
   (pps ppx_deriving.show ppx_jane bisect_ppx)))
+
+(executable
+ (name pvp_bonus)
+ (modules pvp_bonus)
+ (libraries core connect4_bonus mcts)
+ (preprocess
+  (pps ppx_deriving.show ppx_jane bisect_ppx)))

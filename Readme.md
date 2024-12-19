@@ -1,12 +1,16 @@
-<center>
-<h1>Web-Based Gravity Connect-4 Game</h1>
-</center>
+<h1 style="text-align: center;">Web-Based Gravity Connect-4 Game</h1>
+
+<p align="center">
+  <a href="https://ocaml.org/"><img src="https://img.shields.io/badge/Backend-OCaml-orange" alt="OCaml"></a>
+  <a href="https://rescript-lang.org/"><img src="https://img.shields.io/badge/Frontend-ReScript-blue" alt="ReScript"></a>
+  <a href="https://aantron.github.io/dream/"><img src="https://img.shields.io/badge/WebServer-Dream-purple" alt="Dream"></a>
+</p>
 
 ## 🔭 Overview 🔭
 
-This repo implements a web-based Gravity Connect-4 with OCaml backend and ReScript frontend.
+This repo implements a web-based Gravity Connect-4 with [OCaml](https://ocaml.org/) backend and [ReScript](https://rescript-lang.org/) frontend, communicating via [Dream](https://aantron.github.io/dream/).
 
-> What is Gravity Connect-4?
+> **What is *Gravity Connect-4?***
 > - Whoever connects 4 pieces in a row, column, or diagonal wins the game
 > - In *Gravity* Connect-4, pieces fall to the lowest available spot in the column
 

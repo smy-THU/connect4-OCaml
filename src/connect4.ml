@@ -72,12 +72,13 @@ let is_terminal (state : state) : bool =
   if is_empty state.board then 
     false
   else
-    is_full state.board || check_winner state.board state.current_player || check_winner state.board (3-state.current_player)
+    is_full state.board || check_winner_with_last state
 
 (* Evaluate the board: return +1 for Player1 win, -1 for Player2 win, 0 otherwise *)
 let evaluate (state : state) : float =
+  let last_player = Utils.switch_player state.current_player in
   if check_winner_with_last state then
-    if state.current_player = 1 then 1.0 (*last_player player2 wins*)
+    if last_player = 2 then 1.0 (*last_player player2 wins*)
     else -1.0 (*last_player player1 wins*)
   else 0.0
 

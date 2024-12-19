@@ -57,7 +57,7 @@ let initial_state (h:int) (w:int) (player:player_t) (bonus_point : point_t): sta
 (* Check if the board is full, using the state *)
 let is_full_state (state : state) : bool =
   let h = Utils.get_h state.board in
-  if h < 6 then 
+  if h < 2 then 
     failwith "the board is invalid."
   else
     match state.get_bonus with
